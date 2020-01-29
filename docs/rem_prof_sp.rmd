@@ -1,0 +1,25 @@
+---
+title: "Análise remuneralção professores no estado de São Paulo"
+author: "Jessica Voigt"
+date: "29 de janeiro de 2020"
+output: 
+  html_document:
+    theme: readable 
+    toc: true 
+    toc_depth: 3 
+    code_folding: hide 
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+## Introdução
+
+Esse documento é uma análise do padrão de remuneração dos profissionais de educação em São Paulo. Trata-se de uma análise exploratória para definirmos o que podemos fazer em nível nacional.<br>
+Utilizamos o arquivo [Remuneração de Profissionais do Magistério de São Paulo – 2019](ftp://ftp2.fnde.gov.br/dadosabertos/SIOPE/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2019.CSV), disponível na sessão ["Arquivos - Dados analíticos"](https://www.fnde.gov.br/index.php/fnde_sistemas/siope/relatorios/arquivos-dados-analiticos) do SIOPE.
+
+<br><br>
+
