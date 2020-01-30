@@ -4,22 +4,98 @@ author: "Jessica Voigt"
 date: "29 de janeiro de 2020"
 output: 
   html_document:
-    theme: readable 
+    theme: paper
     toc: true 
     toc_depth: 3 
     code_folding: hide 
     toc_float: true
 ---
 
-```{r setup, include=FALSE}
+```{r, warning=FALSE, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(dplyr)
 ```
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(data.table)
+library(janitor)
+library(kableExtra)
+
+load("~/R-Projects/qualidade_gastos_educação/analise_gastos_siope/data/rem_prof_sp.Rdata")
+```
+
 
 ## Introdução
 
 Esse documento é uma análise do padrão de remuneração dos profissionais de educação em São Paulo. Trata-se de uma análise exploratória para definirmos o que podemos fazer em nível nacional.<br>
-Utilizamos o arquivo [Remuneração de Profissionais do Magistério de São Paulo – 2019](ftp://ftp2.fnde.gov.br/dadosabertos/SIOPE/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2019.CSV), disponível na sessão ["Arquivos - Dados analíticos"](https://www.fnde.gov.br/index.php/fnde_sistemas/siope/relatorios/arquivos-dados-analiticos) do SIOPE.
+
+A princípio, iríamos utilizar o arquivo [Remuneração de Profissionais do Magistério de São Paulo – 2019](ftp://ftp2.fnde.gov.br/dadosabertos/SIOPE/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2019.CSV), disponível na sessão ["Arquivos - Dados analíticos"](https://www.fnde.gov.br/index.php/fnde_sistemas/siope/relatorios/arquivos-dados-analiticos) do SIOPE. No entanto, como a última data de atualização foi 30/08/2019 e o arquivo continha informações apenas dos períodos 1, 2 e 3, resolvemos primeiro fazer a análise exploratória do arquivo [Remuneração de Profissionais do Magistério de São Paulo – 2018](ftp://ftp2.fnde.gov.br/dadosabertos/SIOPE/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2018.CSV) . 
 
 <br><br>
+
+## Dicionário de dados
+<br>
+
+|Nome da Coluna| Descrição do Dado|
+|-----|------------|
+|AN_EXERCICIO| Ano base da declaração|
+|NU_PERIODO| Período do ano base a que se refere a declaração (1,2,3,4,5,6). De 2008 a 2016, o período 1 refere-se à declaração anual. A partir de 2017, os dados passaram a ser bimestrais, sendo o período 6 a consolidação anual|
+|ME_EXERCICIO| Mês do ano em que foram pagos os vencimentos para o profissional de educação (1 a 12)|
+|CO_UF| Código da UF. Mesmo código usado pelo IBGE.|
+|NO_UF| Nome da unidade federativa|
+|CO_MUNICIPIO| Código do município.É o código completo usado pelo IBGE.|
+|NO_MUNICIPIO| Nome do município.|
+|NU_REMUNERACAO| Sequencial de remuneração|
+|NO_PROFISSIONAL| Nome do profissional do magistério/Educação.|
+|LOCAL_ EXERCICIO| Escola onde o profissional exerce sua função / Entidade|
+|CARGA_HORARIA| Carga Horária de trabalho do profissional|
+|TP_CATEGORIA| Código do tipo de categoria do profissional: 1 - Profissionais do magistério; 2 - Outros profissionais da educação.|
+|CATEG_PROFISSIONAL| Número sequencial da categoria do profissional do magistério/Educação.|
+|VL_SALARIO| Salário ou Vencimento Básico do profissional da educação|
+|VL_PARC_MINIMA_FUNDEB| Vencimento Bruto da Remuneração - Com Parcela mínima de 60% do FUNDEB|
+|VL_PARC_MAXIMA_FUNDEB| Valor Bruto da Remuneração - Com parcela máxima de 40% do FUNDEB|
+|VL_OUTRAS_RECEITAS| Valor Bruto da Remuneração - Com outros recursos|
+|VL_TOTAL| VL_PARC_MINIMA_FUNDEB + VL_PARC_MAXIMA_FUNDEB + VL_OUTRAS_RECEITAS| 
+
+<br><br>
+
+## Análise exploratória
+
+###1. Conferindo os anos de execução contidos no arquivo:
+```{r, warning=FALSE}
+unique(rem_prof_sp$AN_EXERCICIO)
+```
+<br>
+###2. Quantidade de missings por variável
+
+```{r}
+as.data.frame(colSums(is.na(rem_prof_sp)))
+```
+<br>
+
+###3. Quantos funcionários constam no arquivo?
+
+Como não temos dados de RG ou CPF, temos que verificar pelo nome, filtrados por município.
+
+```{r}
+rem_prof_sp %>% 
+  distinct(CO_MUNICIPIO, CATEG_PROFISSIONAL, NO_PROFISSIONAL) %>%
+  group_by(CATEG_PROFISSIONAL) %>%
+  summarise(qtde_funcionarios = n()) %>%
+  adorn_totals("row") %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed","responsive"))
+```
+
+###4. Descrição da variável VL_SALARIO:
+
+```{r}
+
+summary(rem_prof_sp$VL_SALARIO)
+  
+```
+
+De acordo com o codebook acima, a partir de 2017 o NU_PERIODO == 6 corresponde a consolidação anual do VL_SALARIO. Entendo então que o NU_PERIODO == 6 deve corresponder a **5 x VL_SALARIO** ou **6 x VL_SALARIO**. Vamos conferir:
 
