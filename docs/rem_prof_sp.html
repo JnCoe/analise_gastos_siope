@@ -317,7 +317,8 @@ library(kableExtra)
 load(&quot;~/R-Projects/qualidade_gastos_educação/analise_gastos_siope/data/rem_prof_sp.Rdata&quot;)</code></pre>
 <div id="introducao" class="section level2">
 <h2>Introdução</h2>
-<p>Esse documento é uma análise do padrão de remuneração dos profissionais de educação em São Paulo. Trata-se de uma análise exploratória para definirmos o que podemos fazer em nível nacional.<br> Utilizamos o arquivo <a href="ftp://ftp2.fnde.gov.br/dadosabertos/SIOPE/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2019.CSV">Remuneração de Profissionais do Magistério de São Paulo – 2019</a>, disponível na sessão <a href="https://www.fnde.gov.br/index.php/fnde_sistemas/siope/relatorios/arquivos-dados-analiticos">“Arquivos - Dados analíticos”</a> do SIOPE.</p>
+<p>Esse documento é uma análise do padrão de remuneração dos profissionais de educação em São Paulo. Trata-se de uma análise exploratória para definirmos o que podemos fazer em nível nacional.<br></p>
+<p>Como a última data de atualização dos arquivos do SIOPE consta como 30/08/2019, iríamos fazer uma análise exploratória do arquivo <a href="ftp://ftp2.fnde.gov.br/dadosabertos/SIOPE/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2018.CSV">Remuneração de Profissionais do Magistério de São Paulo – 2018</a> . No entanto, verifiquei que todos os links para os arquivos dos anos de 2018 tinham, na verdade, arquivos para os anos de 2019 (<a href="https://voigtjessica.github.io/analise_gastos_siope/revisao_dados_2018">veja a verificação aqui</a>), de forma que decidi trabalhar apenas com o arquivo <em>Remuneração de Profissionais do Magistério de São Paulo – 2019</em></p>
 <p><br><br></p>
 </div>
 <div id="dicionario-de-dados" class="section level2">
@@ -412,11 +413,17 @@ load(&quot;~/R-Projects/qualidade_gastos_educação/analise_gastos_siope/data/re
 <p><br><br></p>
 </div>
 <div id="analise-exploratoria" class="section level2">
-<h2>Análise exploratória</h2>
+<h2>1. Análise exploratória</h2>
 <div id="conferindo-os-anos-de-execucao-contidos-no-arquivo" class="section level3">
-<h3>1. Conferindo os anos de execução contidos no arquivo:</h3>
+<h3>Conferindo os anos de execução contidos no arquivo:</h3>
 <pre class="r"><code>unique(rem_prof_sp$AN_EXERCICIO)</code></pre>
 <pre><code>## [1] &quot;2019&quot;</code></pre>
+<p>E os bimestres contidos:</p>
+<pre class="r"><code>unique(rem_prof_sp$NU_PERIODO)</code></pre>
+<pre><code>## [1] &quot;1&quot; &quot;2&quot; &quot;3&quot;</code></pre>
+<p><br> E os meses:</p>
+<pre class="r"><code>unique(rem_prof_sp$ME_EXERCICIO)</code></pre>
+<pre><code>## [1] &quot;01&quot; &quot;03&quot; &quot;04&quot; &quot;06&quot; &quot;02&quot; &quot;05&quot;</code></pre>
 <p><br> ###2. Quantidade de missings por variável</p>
 <pre class="r"><code>as.data.frame(colSums(is.na(rem_prof_sp)))</code></pre>
 <pre><code>##                       colSums(is.na(rem_prof_sp))
@@ -440,13 +447,17 @@ load(&quot;~/R-Projects/qualidade_gastos_educação/analise_gastos_siope/data/re
 ## VL_TOTAL                                        0</code></pre>
 <p><br></p>
 </div>
-<div id="quantos-funcionarios-constam-no-arquivo" class="section level3">
-<h3>3. Quantos funcionários constam no arquivo?</h3>
+<div id="quantos-funcionarios-constam-no-arquivo-e-media-salarial" class="section level3">
+<h3>Quantos funcionários constam no arquivo e média salarial?</h3>
 <p>Como não temos dados de RG ou CPF, temos que verificar pelo nome, filtrados por município.</p>
 <pre class="r"><code>rem_prof_sp %&gt;% 
-  distinct(CO_MUNICIPIO, CATEG_PROFISSIONAL, NO_PROFISSIONAL) %&gt;%
+  distinct(CO_MUNICIPIO, CATEG_PROFISSIONAL, NO_PROFISSIONAL, .keep_all = TRUE) %&gt;%
   group_by(CATEG_PROFISSIONAL) %&gt;%
-  summarise(qtde_funcionarios = n()) %&gt;%
+  summarise(qtde_funcionarios = n(),
+            media_salarial = round(mean(VL_SALARIO),0)) %&gt;%
+  ungroup() %&gt;%
+  arrange(desc(qtde_funcionarios)) %&gt;%
+  mutate(perc = round(qtde_funcionarios/324338, 2)) %&gt;%
   adorn_totals(&quot;row&quot;) %&gt;%
   kable() %&gt;% 
   kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;,&quot;responsive&quot;))</code></pre>
@@ -459,23 +470,27 @@ CATEG_PROFISSIONAL
 <th style="text-align:right;">
 qtde_funcionarios
 </th>
+<th style="text-align:right;">
+media_salarial
+</th>
+<th style="text-align:right;">
+perc
+</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left;">
-Auxiliar/Assistente Educacional
+Docente habilitado em curso de pedagogia
 </td>
 <td style="text-align:right;">
-30773
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente graduado bacharél e tecnólogo com diploma de mestrado ou doutorado na área do componente cur
+130846
 </td>
 <td style="text-align:right;">
-288
+3511
+</td>
+<td style="text-align:right;">
+0.40
 </td>
 </tr>
 <tr>
@@ -485,61 +500,11 @@ Docente habilitado em curso de licenciatura plena
 <td style="text-align:right;">
 60165
 </td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente habilitado em curso de nível médio
+<td style="text-align:right;">
+3410
 </td>
 <td style="text-align:right;">
-15675
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente habilitado em curso de pedagogia
-</td>
-<td style="text-align:right;">
-130846
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente habilitado em programa especial de formação pedagogica de docentes
-</td>
-<td style="text-align:right;">
-1436
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente instrutor, tradutor e intérprete de libras
-</td>
-<td style="text-align:right;">
-108
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente pós-graduado em cursos de especialização para formação de docentes para educação profissiona
-</td>
-<td style="text-align:right;">
-6184
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente professor de comunidade quilombola
-</td>
-<td style="text-align:right;">
-4
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente professor indígena sem prévia formação pedagógica
-</td>
-<td style="text-align:right;">
-5
+0.19
 </td>
 </tr>
 <tr>
@@ -549,37 +514,25 @@ Profissionais em efetivo exercício no âmbito da educação infantil e ensino f
 <td style="text-align:right;">
 31964
 </td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Profissionais experientes, não graduados, autorizados a atuar como docentes, em caráter precário e p
+<td style="text-align:right;">
+3794
 </td>
 <td style="text-align:right;">
-51
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Profissionais graduados, bacharéis e tecnólogos autorizados a atuar como docentes, em caráter precár
-</td>
-<td style="text-align:right;">
-525
+0.10
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Profissionais não habilitados, porém autorizados a exercer a docência em caráter precário e provisór
+Auxiliar/Assistente Educacional
 </td>
 <td style="text-align:right;">
-274
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Profissionais que atuam na realização das atividades requeridos nos ambientes de secretaria, de manu
+30773
 </td>
 <td style="text-align:right;">
-16140
+1779
+</td>
+<td style="text-align:right;">
+0.09
 </td>
 </tr>
 <tr>
@@ -589,6 +542,166 @@ Profissionais que exercem funções de secretaria escolar, alimentação escolar
 <td style="text-align:right;">
 29900
 </td>
+<td style="text-align:right;">
+1677
+</td>
+<td style="text-align:right;">
+0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Profissionais que atuam na realização das atividades requeridos nos ambientes de secretaria, de manu
+</td>
+<td style="text-align:right;">
+16140
+</td>
+<td style="text-align:right;">
+1580
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente habilitado em curso de nível médio
+</td>
+<td style="text-align:right;">
+15675
+</td>
+<td style="text-align:right;">
+2678
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente pós-graduado em cursos de especialização para formação de docentes para educação profissiona
+</td>
+<td style="text-align:right;">
+6184
+</td>
+<td style="text-align:right;">
+2933
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente habilitado em programa especial de formação pedagogica de docentes
+</td>
+<td style="text-align:right;">
+1436
+</td>
+<td style="text-align:right;">
+2646
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Profissionais graduados, bacharéis e tecnólogos autorizados a atuar como docentes, em caráter precár
+</td>
+<td style="text-align:right;">
+525
+</td>
+<td style="text-align:right;">
+2946
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente graduado bacharél e tecnólogo com diploma de mestrado ou doutorado na área do componente cur
+</td>
+<td style="text-align:right;">
+288
+</td>
+<td style="text-align:right;">
+3354
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Profissionais não habilitados, porém autorizados a exercer a docência em caráter precário e provisór
+</td>
+<td style="text-align:right;">
+274
+</td>
+<td style="text-align:right;">
+1472
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente instrutor, tradutor e intérprete de libras
+</td>
+<td style="text-align:right;">
+108
+</td>
+<td style="text-align:right;">
+2845
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Profissionais experientes, não graduados, autorizados a atuar como docentes, em caráter precário e p
+</td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:right;">
+2204
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente professor indígena sem prévia formação pedagógica
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+2646
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente professor de comunidade quilombola
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3443
+</td>
+<td style="text-align:right;">
+0.00
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -597,27 +710,643 @@ Total
 <td style="text-align:right;">
 324338
 </td>
+<td style="text-align:right;">
+42918
+</td>
+<td style="text-align:right;">
+0.99
+</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div id="descricao-da-variavel-vl_salario" class="section level3">
-<h3>4. Descrição da variável VL_SALARIO:</h3>
+<h3>Descrição da variável VL_SALARIO:</h3>
 <pre class="r"><code>summary(rem_prof_sp$VL_SALARIO)</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##       0    1926    2741    3168    4015  322650</code></pre>
-<p>Vendo quem é que tem esse valor de salário discrepante (acima de 100 mil):</p>
+</div>
+<div id="verificando-se-a-variavel-nu_remuneracao-se-repete" class="section level3">
+<h3>Verificando se a variável NU_REMUNERACAO se repete:</h3>
+<p>Admito que o <code>NU_REMUNERACAO</code> é único por município:</p>
 <pre class="r"><code>rem_prof_sp %&gt;%
-  filter(VL_SALARIO &gt; 100000) %&gt;%
-  select(NO_UF, NO_MUNICIPIO, NO_PROFISSIONAL, CATEG_PROFISSIONAL, VL_SALARIO) %&gt;%
-  kable() %&gt;% 
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;,&quot;responsive&quot;))</code></pre>
-<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+  group_by(CO_MUNICIPIO, NU_REMUNERACAO) %&gt;%
+  summarise(total_nu_remuneracao = n()) %&gt;%
+  filter(total_nu_remuneracao &gt; 1) %&gt;%
+  nrow()</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p>Eles não se repetem.</p>
+<p>Eu não sei ao certo do que se trata essa variável. Fiz um pedido LAI para o FNDE solicitando maiores esclarecimentos. <em>Acredito</em> ser um “protocolo de pagamento”, algo que registra uma transição específica.</p>
+</div>
+</div>
+<div id="inconsistencias" class="section level2">
+<h2>2. Inconsistências</h2>
+<div id="mais-de-um-registro-de-pagamento-por-mes" class="section level3">
+<h3>Mais de um registro de pagamento por mês:</h3>
+<p>Assumindo que cada linha consista em um pagamento dado a uma pessoa <code>NO_PROFISSIONAL</code> em um determinado <code>ME_EXERCICIO</code>, existem pessoas com mais de um registro de pagamento na mesma função, local e mês?</p>
+<pre class="r"><code>rem_prof_sp %&gt;%
+  group_by(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL, ME_EXERCICIO ) %&gt;%
+  summarise(total_registros = n()) %&gt;%
+  filter(total_registros &gt; 2) %&gt;%
+  distinct(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL) %&gt;% 
+  nrow()</code></pre>
+<pre><code>## [1] 281</code></pre>
+<p>Foram registradas 281 pessoas que tiveram ao menos dois registros de pagamento em um mesmo mês, local e exercendo a mesma função.</p>
+<pre class="r"><code>rem_prof_sp %&gt;%
+  group_by(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL, ME_EXERCICIO ) %&gt;%
+  summarise(total_registros = n()) %&gt;%
+  filter(total_registros &gt; 3) %&gt;%
+  distinct(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL) %&gt;% 
+  nrow()</code></pre>
+<pre><code>## [1] 126</code></pre>
+<p>Das 281 pessoas, 126 registraram 3 pagamentos para um mesmo local, mÊs e função.</p>
+<pre class="r"><code>rem_prof_sp %&gt;%
+  group_by(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL, ME_EXERCICIO ) %&gt;%
+  summarise(total_registros = n()) %&gt;%
+  filter(total_registros &gt; 4) %&gt;%
+  distinct(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL) %&gt;% 
+  nrow()</code></pre>
+<pre><code>## [1] 5</code></pre>
+<p>E cinco pessoas tiveram amis de 4 pagamentos registrados para a mesma função, local e mês.</p>
+<p>Esses pagamentos se concentram em algum município específico? E quantos funcionários receberam duas ou mais vezes por município?</p>
+<pre class="r"><code>p &lt;- rem_prof_sp %&gt;%
+  group_by(CO_MUNICIPIO,NO_MUNICIPIO, LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL, ME_EXERCICIO ) %&gt;%
+  summarise(total_registros = n()) %&gt;%
+  filter(total_registros &gt; 2) %&gt;%
+  ungroup() %&gt;%
+  group_by(CO_MUNICIPIO, LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL) %&gt;%
+  summarise(total_repeticoes = n()) %&gt;%
+  ungroup() %&gt;%
+  group_by(CO_MUNICIPIO) %&gt;%
+  summarise(total_funcionarios = n())
+
+rem_prof_sp %&gt;%
+  group_by(CO_MUNICIPIO,NO_MUNICIPIO, LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL, ME_EXERCICIO ) %&gt;%
+  summarise(total_registros = n()) %&gt;%
+  filter(total_registros &gt; 2) %&gt;%
+  ungroup() %&gt;%
+  group_by(CO_MUNICIPIO, NO_MUNICIPIO) %&gt;%
+  summarise(ocorrencias_registros_repetidos = n()) %&gt;%
+  arrange(desc(ocorrencias_registros_repetidos)) %&gt;%
+  left_join(p) %&gt;%
+  kable() %&gt;%
+  kable_styling()</code></pre>
+<pre><code>## Joining, by = &quot;CO_MUNICIPIO&quot;</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:left;">
-NO_UF
+CO_MUNICIPIO
 </th>
+<th style="text-align:left;">
+NO_MUNICIPIO
+</th>
+<th style="text-align:right;">
+ocorrencias_registros_repetidos
+</th>
+<th style="text-align:right;">
+total_funcionarios
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+353470
+</td>
+<td style="text-align:left;">
+Ourinhos
+</td>
+<td style="text-align:right;">
+74
+</td>
+<td style="text-align:right;">
+73
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+350760
+</td>
+<td style="text-align:left;">
+Bragança Paulista
+</td>
+<td style="text-align:right;">
+46
+</td>
+<td style="text-align:right;">
+39
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+353080
+</td>
+<td style="text-align:left;">
+Moji Mirim
+</td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+38
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+351040
+</td>
+<td style="text-align:left;">
+Capivari
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+23
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+353060
+</td>
+<td style="text-align:left;">
+Mogi das Cruzes
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+19
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+350800
+</td>
+<td style="text-align:left;">
+Buri
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+352210
+</td>
+<td style="text-align:left;">
+Itanhaém
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+351150
+</td>
+<td style="text-align:left;">
+Cerquilho
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+353390
+</td>
+<td style="text-align:left;">
+Olímpia
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+354060
+</td>
+<td style="text-align:left;">
+Porto Feliz
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+350600
+</td>
+<td style="text-align:left;">
+Bauru
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+353570
+</td>
+<td style="text-align:left;">
+Paraíso
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+353030
+</td>
+<td style="text-align:left;">
+Mirassol
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+354680
+</td>
+<td style="text-align:left;">
+Santa Isabel
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+350420
+</td>
+<td style="text-align:left;">
+Auriflama
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+351230
+</td>
+<td style="text-align:left;">
+Conchas
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+351280
+</td>
+<td style="text-align:left;">
+Cosmópolis
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+351670
+</td>
+<td style="text-align:left;">
+Garça
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+353250
+</td>
+<td style="text-align:left;">
+Neves Paulista
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+354390
+</td>
+<td style="text-align:left;">
+Rio Claro
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+350010
+</td>
+<td style="text-align:left;">
+Adamantina
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+350170
+</td>
+<td style="text-align:left;">
+Américo Brasiliense
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+350550
+</td>
+<td style="text-align:left;">
+Barretos
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+350570
+</td>
+<td style="text-align:left;">
+Barueri
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+350610
+</td>
+<td style="text-align:left;">
+Bebedouro
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+350650
+</td>
+<td style="text-align:left;">
+Birigui
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+351060
+</td>
+<td style="text-align:left;">
+Carapicuíba
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+351390
+</td>
+<td style="text-align:left;">
+Divinolândia
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+352030
+</td>
+<td style="text-align:left;">
+Iguape
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+352044
+</td>
+<td style="text-align:left;">
+Ilha Solteira
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+352320
+</td>
+<td style="text-align:left;">
+Itararé
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+352420
+</td>
+<td style="text-align:left;">
+Jaborandi
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+353110
+</td>
+<td style="text-align:left;">
+Mongaguá
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+354260
+</td>
+<td style="text-align:left;">
+Registro
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+354270
+</td>
+<td style="text-align:left;">
+Restinga
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+354630
+</td>
+<td style="text-align:left;">
+Santa Cruz das Palmeiras
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="outliers-nos-pagamentos" class="section level3">
+<h3>Outliers nos pagamentos</h3>
+</div>
+<div id="salarios-que-constam-como-menores-que-1-real" class="section level3">
+<h3>Salários que constam como menores que 1 real:</h3>
+<pre class="r"><code>rem_prof_sp %&gt;%
+  filter(VL_SALARIO &lt; 1) %&gt;%
+  nrow()</code></pre>
+<pre><code>## [1] 24</code></pre>
+</div>
+<div id="quem-sao-os-maiores-salarios-100-mil" class="section level3">
+<h3>Quem são os maiores salários? (&gt; 100 mil)</h3>
+<pre class="r"><code>rem_prof_sp %&gt;%
+  filter(VL_SALARIO &gt; 100000) %&gt;%
+  select(NO_MUNICIPIO, NO_PROFISSIONAL, CATEG_PROFISSIONAL, ME_EXERCICIO, VL_SALARIO) %&gt;% 
+  arrange(NO_PROFISSIONAL) %&gt;%
+  kable() %&gt;%
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
 <th style="text-align:left;">
 NO_MUNICIPIO
 </th>
@@ -627,6 +1356,9 @@ NO_PROFISSIONAL
 <th style="text-align:left;">
 CATEG_PROFISSIONAL
 </th>
+<th style="text-align:left;">
+ME_EXERCICIO
+</th>
 <th style="text-align:right;">
 VL_SALARIO
 </th>
@@ -634,9 +1366,6 @@ VL_SALARIO
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
-Sao Paulo
-</td>
 <td style="text-align:left;">
 Ipuã
 </td>
@@ -646,14 +1375,31 @@ Karina Aparecida Pavanelli Horacio
 <td style="text-align:left;">
 Docente habilitado em curso de licenciatura plena
 </td>
+<td style="text-align:left;">
+05
+</td>
 <td style="text-align:right;">
 203526
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Sao Paulo
+Ipuã
 </td>
+<td style="text-align:left;">
+Karina Aparecida Pavanelli Horacio
+</td>
+<td style="text-align:left;">
+Docente habilitado em curso de licenciatura plena
+</td>
+<td style="text-align:left;">
+06
+</td>
+<td style="text-align:right;">
+203526
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 Presidente Bernardes
 </td>
@@ -663,14 +1409,46 @@ Patricia Solano Pereira de Souza
 <td style="text-align:left;">
 Docente habilitado em curso de nível médio
 </td>
+<td style="text-align:left;">
+03
+</td>
 <td style="text-align:right;">
 322650
 </td>
 </tr>
+</tbody>
+</table>
+<p>Vimos que pagamentos acima de R$ 100 mil ocorreram apenas para duas pessoas, sendo duas vezes para uma pessoa e uma para outra pessoa. O arquivo de 2019 não contém dados consolidados, ou seja, esses valores (se corretos) correspontem ao pagamento de um único mês e não o consolidado do ano.</p>
+<p>Ainda é possível que seja apenas um erro de digitação. Vamos ver o quanto essas duas funcionárias receberam nos outros meses:</p>
+<pre class="r"><code>rem_prof_sp %&gt;%
+  filter(NO_PROFISSIONAL %in% c(&quot;Karina Aparecida Pavanelli Horacio&quot;,
+                  &quot;Patricia Solano Pereira de Souza&quot;)) %&gt;%
+  select(NO_MUNICIPIO, NO_PROFISSIONAL, CATEG_PROFISSIONAL, ME_EXERCICIO, VL_SALARIO) %&gt;% 
+  arrange(NO_PROFISSIONAL) %&gt;%
+  kable() %&gt;%
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
 <tr>
-<td style="text-align:left;">
-Sao Paulo
-</td>
+<th style="text-align:left;">
+NO_MUNICIPIO
+</th>
+<th style="text-align:left;">
+NO_PROFISSIONAL
+</th>
+<th style="text-align:left;">
+CATEG_PROFISSIONAL
+</th>
+<th style="text-align:left;">
+ME_EXERCICIO
+</th>
+<th style="text-align:right;">
+VL_SALARIO
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td style="text-align:left;">
 Ipuã
 </td>
@@ -680,23 +1458,152 @@ Karina Aparecida Pavanelli Horacio
 <td style="text-align:left;">
 Docente habilitado em curso de licenciatura plena
 </td>
+<td style="text-align:left;">
+05
+</td>
 <td style="text-align:right;">
-203526
+203526.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ipuã
+</td>
+<td style="text-align:left;">
+Karina Aparecida Pavanelli Horacio
+</td>
+<td style="text-align:left;">
+Docente habilitado em curso de licenciatura plena
+</td>
+<td style="text-align:left;">
+02
+</td>
+<td style="text-align:right;">
+998.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ipuã
+</td>
+<td style="text-align:left;">
+Karina Aparecida Pavanelli Horacio
+</td>
+<td style="text-align:left;">
+Docente habilitado em curso de licenciatura plena
+</td>
+<td style="text-align:left;">
+03
+</td>
+<td style="text-align:right;">
+998.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ipuã
+</td>
+<td style="text-align:left;">
+Karina Aparecida Pavanelli Horacio
+</td>
+<td style="text-align:left;">
+Docente habilitado em curso de licenciatura plena
+</td>
+<td style="text-align:left;">
+04
+</td>
+<td style="text-align:right;">
+998.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ipuã
+</td>
+<td style="text-align:left;">
+Karina Aparecida Pavanelli Horacio
+</td>
+<td style="text-align:left;">
+Docente habilitado em curso de licenciatura plena
+</td>
+<td style="text-align:left;">
+06
+</td>
+<td style="text-align:right;">
+203526.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Presidente Bernardes
+</td>
+<td style="text-align:left;">
+Patricia Solano Pereira de Souza
+</td>
+<td style="text-align:left;">
+Docente habilitado em curso de nível médio
+</td>
+<td style="text-align:left;">
+03
+</td>
+<td style="text-align:right;">
+322650.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Presidente Bernardes
+</td>
+<td style="text-align:left;">
+Patricia Solano Pereira de Souza
+</td>
+<td style="text-align:left;">
+Docente habilitado em curso de nível médio
+</td>
+<td style="text-align:left;">
+06
+</td>
+<td style="text-align:right;">
+817.38
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Presidente Bernardes
+</td>
+<td style="text-align:left;">
+Patricia Solano Pereira de Souza
+</td>
+<td style="text-align:left;">
+Docente habilitado em curso de nível médio
+</td>
+<td style="text-align:left;">
+04
+</td>
+<td style="text-align:right;">
+817.38
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Presidente Bernardes
+</td>
+<td style="text-align:left;">
+Patricia Solano Pereira de Souza
+</td>
+<td style="text-align:left;">
+Docente habilitado em curso de nível médio
+</td>
+<td style="text-align:left;">
+05
+</td>
+<td style="text-align:right;">
+372.84
 </td>
 </tr>
 </tbody>
 </table>
-</div>
-<div id="valores-de-salarios-menores-que-r-1" class="section level3">
-<h3>3. Valores de salários menores que R$ 1</h3>
-<pre class="r"><code>rem_prof_sp %&gt;%
-  mutate(sem_info_salario = ifelse(VL_SALARIO &lt; 1, 1, 0)) %&gt;%
-  summarise(total_sem_info_salario = sum(sem_info_salario))</code></pre>
-<pre><code>## # A tibble: 1 x 1
-##   total_sem_info_salario
-##                    &lt;dbl&gt;
-## 1                     24</code></pre>
-<p><br> Verificamos que 24 salários constam abaixo de 1 real, vou ver se é o caso de alguem</p>
+<p><strong>Como podemos interpretar esses dados?</strong></p>
 </div>
 </div>
 

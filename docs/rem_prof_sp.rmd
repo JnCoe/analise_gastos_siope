@@ -31,7 +31,7 @@ load("~/R-Projects/qualidade_gastos_educação/analise_gastos_siope/data/rem_pro
 
 Esse documento é uma análise do padrão de remuneração dos profissionais de educação em São Paulo. Trata-se de uma análise exploratória para definirmos o que podemos fazer em nível nacional.<br>
 
-A princípio, iríamos utilizar o arquivo [Remuneração de Profissionais do Magistério de São Paulo – 2019](ftp://ftp2.fnde.gov.br/dadosabertos/SIOPE/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2019.CSV), disponível na sessão ["Arquivos - Dados analíticos"](https://www.fnde.gov.br/index.php/fnde_sistemas/siope/relatorios/arquivos-dados-analiticos) do SIOPE. No entanto, como a última data de atualização foi 30/08/2019 e o arquivo continha informações apenas dos períodos 1, 2 e 3, resolvemos primeiro fazer a análise exploratória do arquivo [Remuneração de Profissionais do Magistério de São Paulo – 2018](ftp://ftp2.fnde.gov.br/dadosabertos/SIOPE/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2018.CSV) . 
+Como a última data de atualização dos arquivos do SIOPE consta como 30/08/2019, iríamos fazer uma análise exploratória do arquivo [Remuneração de Profissionais do Magistério de São Paulo – 2018](ftp://ftp2.fnde.gov.br/dadosabertos/SIOPE/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2018.CSV) . No entanto, verifiquei que todos os links para os arquivos dos anos de 2018 tinham, na verdade, arquivos para os anos de 2019 ([veja a verificação aqui](https://voigtjessica.github.io/analise_gastos_siope/revisao_dados_2018)), de forma que decidi trabalhar apenas com o arquivo *Remuneração de Profissionais do Magistério de São Paulo – 2019*
 
 <br><br>
 
@@ -61,11 +61,23 @@ A princípio, iríamos utilizar o arquivo [Remuneração de Profissionais do Mag
 
 <br><br>
 
-## Análise exploratória
+## 1. Análise exploratória
 
-###1. Conferindo os anos de execução contidos no arquivo:
+### Conferindo os anos de execução contidos no arquivo:
 ```{r, warning=FALSE}
 unique(rem_prof_sp$AN_EXERCICIO)
+```
+
+E os bimestres contidos:
+
+```{r}
+unique(rem_prof_sp$NU_PERIODO)
+```
+<br>
+E os meses:
+
+```{r}
+unique(rem_prof_sp$ME_EXERCICIO)
 ```
 <br>
 ###2. Quantidade de missings por variável
@@ -75,21 +87,25 @@ as.data.frame(colSums(is.na(rem_prof_sp)))
 ```
 <br>
 
-###3. Quantos funcionários constam no arquivo?
+### Quantos funcionários constam no arquivo e média salarial?
 
 Como não temos dados de RG ou CPF, temos que verificar pelo nome, filtrados por município.
 
 ```{r}
 rem_prof_sp %>% 
-  distinct(CO_MUNICIPIO, CATEG_PROFISSIONAL, NO_PROFISSIONAL) %>%
+  distinct(CO_MUNICIPIO, CATEG_PROFISSIONAL, NO_PROFISSIONAL, .keep_all = TRUE) %>%
   group_by(CATEG_PROFISSIONAL) %>%
-  summarise(qtde_funcionarios = n()) %>%
+  summarise(qtde_funcionarios = n(),
+            media_salarial = round(mean(VL_SALARIO),0)) %>%
+  ungroup() %>%
+  arrange(desc(qtde_funcionarios)) %>%
+  mutate(perc = round(qtde_funcionarios/324338, 2)) %>%
   adorn_totals("row") %>%
   kable() %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed","responsive"))
 ```
 
-###4. Descrição da variável VL_SALARIO:
+###Descrição da variável VL_SALARIO:
 
 ```{r}
 
@@ -97,5 +113,131 @@ summary(rem_prof_sp$VL_SALARIO)
   
 ```
 
-De acordo com o codebook acima, a partir de 2017 o NU_PERIODO == 6 corresponde a consolidação anual do VL_SALARIO. Entendo então que o NU_PERIODO == 6 deve corresponder a **5 x VL_SALARIO** ou **6 x VL_SALARIO**. Vamos conferir:
+### Verificando se a variável NU_REMUNERACAO se repete:
 
+Admito que o `NU_REMUNERACAO` é único por município:
+```{r}
+rem_prof_sp %>%
+  group_by(CO_MUNICIPIO, NU_REMUNERACAO) %>%
+  summarise(total_nu_remuneracao = n()) %>%
+  filter(total_nu_remuneracao > 1) %>%
+  nrow()
+  
+```
+
+Eles não se repetem.
+
+Eu não sei ao certo do que se trata essa variável. Fiz um pedido LAI para o FNDE solicitando maiores esclarecimentos. *Acredito* ser um "protocolo de pagamento", algo que registra uma transição específica.
+
+##2. Inconsistências
+
+### Mais de um registro de pagamento por mês:
+
+Assumindo que cada linha consista em um pagamento dado a uma pessoa `NO_PROFISSIONAL` em um determinado `ME_EXERCICIO`, existem pessoas com mais de um registro de pagamento na mesma função, local e mês?
+
+```{r}
+rem_prof_sp %>%
+  group_by(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL, ME_EXERCICIO ) %>%
+  summarise(total_registros = n()) %>%
+  filter(total_registros > 2) %>%
+  distinct(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL) %>% 
+  nrow()
+```
+
+Foram registradas 281 pessoas que tiveram ao menos dois registros de pagamento em um mesmo mês, local e exercendo a mesma função.
+
+```{r}
+rem_prof_sp %>%
+  group_by(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL, ME_EXERCICIO ) %>%
+  summarise(total_registros = n()) %>%
+  filter(total_registros > 3) %>%
+  distinct(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL) %>% 
+  nrow()
+```
+
+Das 281 pessoas, 126 registraram 3 pagamentos para um mesmo local, mÊs e função.
+
+```{r}
+rem_prof_sp %>%
+  group_by(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL, ME_EXERCICIO ) %>%
+  summarise(total_registros = n()) %>%
+  filter(total_registros > 4) %>%
+  distinct(CO_MUNICIPIO,LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL) %>% 
+  nrow()
+```
+E cinco pessoas tiveram amis de 4 pagamentos registrados para a mesma função, local e mês.
+
+Esses pagamentos se concentram em algum município específico? E quantos funcionários receberam duas ou mais vezes por município?
+
+```{r}
+
+p <- rem_prof_sp %>%
+  group_by(CO_MUNICIPIO,NO_MUNICIPIO, LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL, ME_EXERCICIO ) %>%
+  summarise(total_registros = n()) %>%
+  filter(total_registros > 2) %>%
+  ungroup() %>%
+  group_by(CO_MUNICIPIO, LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL) %>%
+  summarise(total_repeticoes = n()) %>%
+  ungroup() %>%
+  group_by(CO_MUNICIPIO) %>%
+  summarise(total_funcionarios = n())
+
+rem_prof_sp %>%
+  group_by(CO_MUNICIPIO,NO_MUNICIPIO, LOCAL_EXERCICIO, TP_CATEGORIA, 
+           CATEG_PROFISSIONAL, NO_PROFISSIONAL, ME_EXERCICIO ) %>%
+  summarise(total_registros = n()) %>%
+  filter(total_registros > 2) %>%
+  ungroup() %>%
+  group_by(CO_MUNICIPIO, NO_MUNICIPIO) %>%
+  summarise(ocorrencias_registros_repetidos = n()) %>%
+  arrange(desc(ocorrencias_registros_repetidos)) %>%
+  left_join(p) %>%
+  kable() %>%
+  kable_styling()
+```
+
+###Outliers nos pagamentos
+
+### Salários que constam como menores que 1 real:
+
+```{r}
+rem_prof_sp %>%
+  filter(VL_SALARIO < 1) %>%
+  nrow()
+```
+
+### Quem são os maiores salários? (> 100 mil)
+
+```{r}
+rem_prof_sp %>%
+  filter(VL_SALARIO > 100000) %>%
+  select(NO_MUNICIPIO, NO_PROFISSIONAL, CATEG_PROFISSIONAL, ME_EXERCICIO, VL_SALARIO) %>% 
+  arrange(NO_PROFISSIONAL) %>%
+  kable() %>%
+  kable_styling()
+```
+
+Vimos que pagamentos acima de R$ 100 mil ocorreram apenas para duas pessoas, sendo duas vezes para uma pessoa e uma para outra pessoa. O arquivo de 2019 não contém dados consolidados, ou seja, esses valores (se corretos) correspontem ao pagamento de um único mês e não o consolidado do ano.
+
+Ainda é possível que seja apenas um erro de digitação. Vamos ver o quanto essas duas funcionárias receberam nos outros meses:
+
+```{r}
+
+rem_prof_sp %>%
+  filter(NO_PROFISSIONAL %in% c("Karina Aparecida Pavanelli Horacio",
+                  "Patricia Solano Pereira de Souza")) %>%
+  select(NO_MUNICIPIO, NO_PROFISSIONAL, CATEG_PROFISSIONAL, ME_EXERCICIO, VL_SALARIO) %>% 
+  arrange(NO_PROFISSIONAL) %>%
+  kable() %>%
+  kable_styling()
+```
+
+**Como podemos interpretar esses dados?**
