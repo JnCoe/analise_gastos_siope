@@ -1,0 +1,15 @@
+---
+title: "Análise de dados do SIOPE - São Paulo"
+author: "Jessica Voigt"
+date: "30 de janeiro de 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. [Introdução e análise exploratória](https://voigtjessica.github.io/analise_gastos_siope/rem_prof_sp)
+2. Quanto os municípios gastam por escola?
+3. Cruzamentos com dados do censo escolar
+4. Cruzamentos com outros índices
