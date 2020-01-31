@@ -447,17 +447,26 @@ load(&quot;~/R-Projects/qualidade_gastos_educação/analise_gastos_siope/data/re
 ## VL_TOTAL                                        0</code></pre>
 <p><br></p>
 </div>
+<div id="quantas-escolas-constam-no-arquivo" class="section level3">
+<h3>Quantas escolas constam no arquivo?</h3>
+<pre class="r"><code>rem_prof_sp %&gt;%
+  distinct(CO_MUNICIPIO, LOCAL_EXERCICIO) %&gt;%
+  nrow()</code></pre>
+<pre><code>## [1] 10955</code></pre>
+</div>
 <div id="quais-sao-as-categorias-profissionais-que-constam-no-arquivo" class="section level3">
 <h3>Quais são as categorias profissionais que constam no arquivo?</h3>
 <pre class="r"><code>categorias &lt;- unique(rem_prof_sp$CATEG_PROFISSIONAL)
 
 data.frame(&quot;Categorias&quot; = categorias) %&gt;%
   kable() %&gt;%
-  kable_styling()</code></pre>
-<table class="table" style="margin-left: auto; margin-right: auto;">
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;,&quot;responsive&quot;))%&gt;%
+  scroll_box(width = &quot;700px&quot;, height = &quot;200px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:700px; ">
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
-<th style="text-align:left;">
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 Categorias
 </th>
 </tr>
@@ -546,12 +555,15 @@ Docente professor indígena sem prévia formação pedagógica
 </tbody>
 </table>
 </div>
-<div id="distribuicao-de-funcionarios-por-municipio" class="section level3">
-<h3>Distribuição de funcionários por município</h3>
+</div>
+<div id="distribuicao-de-funcionarios-e-escolas-por-municipio" class="section level3">
+<h3>Distribuição de funcionários e escolas por município</h3>
 <pre class="r"><code>rem_prof_sp %&gt;%
   filter(ME_EXERCICIO == &quot;06&quot;) %&gt;%
   group_by(CO_MUNICIPIO ,NO_MUNICIPIO) %&gt;%
-  summarise(qtde_funcionarios = n_distinct(NO_PROFISSIONAL)) %&gt;%
+  summarise(qtde_funcionarios = n_distinct(NO_PROFISSIONAL),
+            qtde_escolas = n_distinct(LOCAL_EXERCICIO),
+            media_funcionario_escola = round(qtde_funcionarios/qtde_escolas, 0)) %&gt;%
   ungroup() %&gt;%
   select(-c(CO_MUNICIPIO)) %&gt;%
   arrange(desc(qtde_funcionarios)) %&gt;%
@@ -569,6 +581,12 @@ NO_MUNICIPIO
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 qtde_funcionarios
 </th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+qtde_escolas
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+media_funcionario_escola
+</th>
 </tr>
 </thead>
 <tbody>
@@ -579,6 +597,12 @@ São Paulo
 <td style="text-align:right;">
 50094
 </td>
+<td style="text-align:right;">
+1489
+</td>
+<td style="text-align:right;">
+34
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -586,6 +610,12 @@ Guarulhos
 </td>
 <td style="text-align:right;">
 7795
+</td>
+<td style="text-align:right;">
+144
+</td>
+<td style="text-align:right;">
+54
 </td>
 </tr>
 <tr>
@@ -595,6 +625,12 @@ Osasco
 <td style="text-align:right;">
 5978
 </td>
+<td style="text-align:right;">
+138
+</td>
+<td style="text-align:right;">
+43
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -602,6 +638,12 @@ Barueri
 </td>
 <td style="text-align:right;">
 5394
+</td>
+<td style="text-align:right;">
+94
+</td>
+<td style="text-align:right;">
+57
 </td>
 </tr>
 <tr>
@@ -611,6 +653,12 @@ São Bernardo do Campo
 <td style="text-align:right;">
 4863
 </td>
+<td style="text-align:right;">
+178
+</td>
+<td style="text-align:right;">
+27
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -619,10 +667,22 @@ Campinas
 <td style="text-align:right;">
 4720
 </td>
+<td style="text-align:right;">
+178
+</td>
+<td style="text-align:right;">
+27
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Sorocaba
+</td>
+<td style="text-align:right;">
+4491
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 4491
@@ -635,6 +695,12 @@ Santo André
 <td style="text-align:right;">
 4073
 </td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4073
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -642,6 +708,12 @@ São José dos Campos
 </td>
 <td style="text-align:right;">
 3004
+</td>
+<td style="text-align:right;">
+132
+</td>
+<td style="text-align:right;">
+23
 </td>
 </tr>
 <tr>
@@ -651,6 +723,12 @@ Piracicaba
 <td style="text-align:right;">
 2735
 </td>
+<td style="text-align:right;">
+120
+</td>
+<td style="text-align:right;">
+23
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -658,6 +736,12 @@ Mogi das Cruzes
 </td>
 <td style="text-align:right;">
 2646
+</td>
+<td style="text-align:right;">
+110
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -667,6 +751,12 @@ São José do Rio Preto
 <td style="text-align:right;">
 2564
 </td>
+<td style="text-align:right;">
+117
+</td>
+<td style="text-align:right;">
+22
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -674,6 +764,12 @@ Indaiatuba
 </td>
 <td style="text-align:right;">
 2563
+</td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:right;">
+39
 </td>
 </tr>
 <tr>
@@ -683,6 +779,12 @@ Mauá
 <td style="text-align:right;">
 2490
 </td>
+<td style="text-align:right;">
+45
+</td>
+<td style="text-align:right;">
+55
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -690,6 +792,12 @@ Bauru
 </td>
 <td style="text-align:right;">
 2448
+</td>
+<td style="text-align:right;">
+76
+</td>
+<td style="text-align:right;">
+32
 </td>
 </tr>
 <tr>
@@ -699,6 +807,12 @@ São Vicente
 <td style="text-align:right;">
 2222
 </td>
+<td style="text-align:right;">
+108
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -706,6 +820,12 @@ Praia Grande
 </td>
 <td style="text-align:right;">
 2221
+</td>
+<td style="text-align:right;">
+73
+</td>
+<td style="text-align:right;">
+30
 </td>
 </tr>
 <tr>
@@ -715,6 +835,12 @@ Santos
 <td style="text-align:right;">
 2074
 </td>
+<td style="text-align:right;">
+80
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -722,6 +848,12 @@ Hortolândia
 </td>
 <td style="text-align:right;">
 2022
+</td>
+<td style="text-align:right;">
+56
+</td>
+<td style="text-align:right;">
+36
 </td>
 </tr>
 <tr>
@@ -731,6 +863,12 @@ Taboão da Serra
 <td style="text-align:right;">
 2012
 </td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+34
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -739,10 +877,22 @@ Embu das Artes
 <td style="text-align:right;">
 1917
 </td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+46
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Itapevi
+</td>
+<td style="text-align:right;">
+1872
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 1872
@@ -755,10 +905,22 @@ Francisco Morato
 <td style="text-align:right;">
 1764
 </td>
+<td style="text-align:right;">
+49
+</td>
+<td style="text-align:right;">
+36
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Taubaté
+</td>
+<td style="text-align:right;">
+1756
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 1756
@@ -771,6 +933,12 @@ Suzano
 <td style="text-align:right;">
 1723
 </td>
+<td style="text-align:right;">
+74
+</td>
+<td style="text-align:right;">
+23
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -778,6 +946,12 @@ Itapetininga
 </td>
 <td style="text-align:right;">
 1715
+</td>
+<td style="text-align:right;">
+82
+</td>
+<td style="text-align:right;">
+21
 </td>
 </tr>
 <tr>
@@ -787,6 +961,12 @@ Ribeirão Preto
 <td style="text-align:right;">
 1700
 </td>
+<td style="text-align:right;">
+105
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -794,6 +974,12 @@ Guarujá
 </td>
 <td style="text-align:right;">
 1666
+</td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+28
 </td>
 </tr>
 <tr>
@@ -803,6 +989,12 @@ Franco da Rocha
 <td style="text-align:right;">
 1663
 </td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:right;">
+31
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -810,6 +1002,12 @@ Santa Bárbara d’Oeste
 </td>
 <td style="text-align:right;">
 1663
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:right;">
+39
 </td>
 </tr>
 <tr>
@@ -819,6 +1017,12 @@ Marília
 <td style="text-align:right;">
 1632
 </td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+27
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -826,6 +1030,12 @@ Santana de Parnaíba
 </td>
 <td style="text-align:right;">
 1587
+</td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -835,6 +1045,12 @@ Sumaré
 <td style="text-align:right;">
 1562
 </td>
+<td style="text-align:right;">
+39
+</td>
+<td style="text-align:right;">
+40
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -842,6 +1058,12 @@ Ourinhos
 </td>
 <td style="text-align:right;">
 1538
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+33
 </td>
 </tr>
 <tr>
@@ -851,6 +1073,12 @@ Carapicuíba
 <td style="text-align:right;">
 1520
 </td>
+<td style="text-align:right;">
+34
+</td>
+<td style="text-align:right;">
+45
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -858,6 +1086,12 @@ Itatiba
 </td>
 <td style="text-align:right;">
 1511
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+26
 </td>
 </tr>
 <tr>
@@ -867,6 +1101,12 @@ Catanduva
 <td style="text-align:right;">
 1474
 </td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+40
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -874,6 +1114,12 @@ Limeira
 </td>
 <td style="text-align:right;">
 1434
+</td>
+<td style="text-align:right;">
+76
+</td>
+<td style="text-align:right;">
+19
 </td>
 </tr>
 <tr>
@@ -883,6 +1129,12 @@ Itapecerica da Serra
 <td style="text-align:right;">
 1410
 </td>
+<td style="text-align:right;">
+69
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -890,6 +1142,12 @@ Botucatu
 </td>
 <td style="text-align:right;">
 1392
+</td>
+<td style="text-align:right;">
+48
+</td>
+<td style="text-align:right;">
+29
 </td>
 </tr>
 <tr>
@@ -899,6 +1157,12 @@ Tatuí
 <td style="text-align:right;">
 1384
 </td>
+<td style="text-align:right;">
+73
+</td>
+<td style="text-align:right;">
+19
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -906,6 +1170,12 @@ São Roque
 </td>
 <td style="text-align:right;">
 1188
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+23
 </td>
 </tr>
 <tr>
@@ -915,6 +1185,12 @@ Salto
 <td style="text-align:right;">
 1167
 </td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+73
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -922,6 +1198,12 @@ Pindamonhangaba
 </td>
 <td style="text-align:right;">
 1128
+</td>
+<td style="text-align:right;">
+55
+</td>
+<td style="text-align:right;">
+21
 </td>
 </tr>
 <tr>
@@ -931,10 +1213,22 @@ Sertãozinho
 <td style="text-align:right;">
 1095
 </td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:right;">
+25
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Itu
+</td>
+<td style="text-align:right;">
+1085
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 1085
@@ -947,6 +1241,12 @@ Itanhaém
 <td style="text-align:right;">
 1076
 </td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+27
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -954,6 +1254,12 @@ Caraguatatuba
 </td>
 <td style="text-align:right;">
 1028
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+21
 </td>
 </tr>
 <tr>
@@ -963,6 +1269,12 @@ Guaratinguetá
 <td style="text-align:right;">
 1022
 </td>
+<td style="text-align:right;">
+41
+</td>
+<td style="text-align:right;">
+25
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -970,6 +1282,12 @@ Bragança Paulista
 </td>
 <td style="text-align:right;">
 1012
+</td>
+<td style="text-align:right;">
+68
+</td>
+<td style="text-align:right;">
+15
 </td>
 </tr>
 <tr>
@@ -979,6 +1297,12 @@ Ribeirão Pires
 <td style="text-align:right;">
 976
 </td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -986,6 +1310,12 @@ Birigui
 </td>
 <td style="text-align:right;">
 966
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+34
 </td>
 </tr>
 <tr>
@@ -995,6 +1325,12 @@ Araçatuba
 <td style="text-align:right;">
 964
 </td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1002,6 +1338,12 @@ Cosmópolis
 </td>
 <td style="text-align:right;">
 925
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+31
 </td>
 </tr>
 <tr>
@@ -1011,6 +1353,12 @@ Presidente Prudente
 <td style="text-align:right;">
 923
 </td>
+<td style="text-align:right;">
+59
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1018,6 +1366,12 @@ Ubatuba
 </td>
 <td style="text-align:right;">
 921
+</td>
+<td style="text-align:right;">
+45
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -1027,6 +1381,12 @@ Jaú
 <td style="text-align:right;">
 868
 </td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1034,6 +1394,12 @@ Caieiras
 </td>
 <td style="text-align:right;">
 867
+</td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+23
 </td>
 </tr>
 <tr>
@@ -1043,6 +1409,12 @@ São Carlos
 <td style="text-align:right;">
 858
 </td>
+<td style="text-align:right;">
+57
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1050,6 +1422,12 @@ Ibiúna
 </td>
 <td style="text-align:right;">
 842
+</td>
+<td style="text-align:right;">
+92
+</td>
+<td style="text-align:right;">
+9
 </td>
 </tr>
 <tr>
@@ -1059,6 +1437,12 @@ São Caetano do Sul
 <td style="text-align:right;">
 811
 </td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+41
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1066,6 +1450,12 @@ Matão
 </td>
 <td style="text-align:right;">
 762
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+28
 </td>
 </tr>
 <tr>
@@ -1075,6 +1465,12 @@ São Sebastião
 <td style="text-align:right;">
 759
 </td>
+<td style="text-align:right;">
+49
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1082,6 +1478,12 @@ Monte Mor
 </td>
 <td style="text-align:right;">
 733
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -1091,6 +1493,12 @@ Itararé
 <td style="text-align:right;">
 731
 </td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:right;">
+28
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1099,10 +1507,22 @@ Tietê
 <td style="text-align:right;">
 707
 </td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+23
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Caçapava
+</td>
+<td style="text-align:right;">
+701
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 701
@@ -1115,6 +1535,12 @@ Campo Limpo Paulista
 <td style="text-align:right;">
 696
 </td>
+<td style="text-align:right;">
+35
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1122,6 +1548,12 @@ Artur Nogueira
 </td>
 <td style="text-align:right;">
 689
+</td>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+30
 </td>
 </tr>
 <tr>
@@ -1131,6 +1563,12 @@ Bebedouro
 <td style="text-align:right;">
 688
 </td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+23
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1138,6 +1576,12 @@ Cruzeiro
 </td>
 <td style="text-align:right;">
 665
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -1147,6 +1591,12 @@ Atibaia
 <td style="text-align:right;">
 664
 </td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1154,6 +1604,12 @@ Leme
 </td>
 <td style="text-align:right;">
 658
+</td>
+<td style="text-align:right;">
+46
+</td>
+<td style="text-align:right;">
+14
 </td>
 </tr>
 <tr>
@@ -1163,6 +1619,12 @@ Penápolis
 <td style="text-align:right;">
 652
 </td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1170,6 +1632,12 @@ Guariba
 </td>
 <td style="text-align:right;">
 650
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+31
 </td>
 </tr>
 <tr>
@@ -1179,6 +1647,12 @@ Paraguaçu Paulista
 <td style="text-align:right;">
 649
 </td>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:right;">
+27
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1186,6 +1660,12 @@ Cerquilho
 </td>
 <td style="text-align:right;">
 640
+</td>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:right;">
+27
 </td>
 </tr>
 <tr>
@@ -1195,6 +1675,12 @@ Porto Ferreira
 <td style="text-align:right;">
 639
 </td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+22
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1202,6 +1688,12 @@ Andradina
 </td>
 <td style="text-align:right;">
 625
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -1211,6 +1703,12 @@ Dracena
 <td style="text-align:right;">
 624
 </td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+33
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1218,6 +1716,12 @@ Votuporanga
 </td>
 <td style="text-align:right;">
 624
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+21
 </td>
 </tr>
 <tr>
@@ -1227,6 +1731,12 @@ Itupeva
 <td style="text-align:right;">
 614
 </td>
+<td style="text-align:right;">
+35
+</td>
+<td style="text-align:right;">
+18
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1235,10 +1745,22 @@ Américo Brasiliense
 <td style="text-align:right;">
 606
 </td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+43
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Ferraz de Vasconcelos
+</td>
+<td style="text-align:right;">
+604
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 604
@@ -1251,6 +1773,12 @@ Várzea Paulista
 <td style="text-align:right;">
 602
 </td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+19
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1258,6 +1786,12 @@ Olímpia
 </td>
 <td style="text-align:right;">
 567
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+19
 </td>
 </tr>
 <tr>
@@ -1267,6 +1801,12 @@ Mongaguá
 <td style="text-align:right;">
 562
 </td>
+<td style="text-align:right;">
+39
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1274,6 +1814,12 @@ Capivari
 </td>
 <td style="text-align:right;">
 555
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+18
 </td>
 </tr>
 <tr>
@@ -1283,6 +1829,12 @@ Moji Mirim
 <td style="text-align:right;">
 554
 </td>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1290,6 +1842,12 @@ Porto Feliz
 </td>
 <td style="text-align:right;">
 553
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -1299,6 +1857,12 @@ Iperó
 <td style="text-align:right;">
 530
 </td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+31
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1306,6 +1870,12 @@ Jales
 </td>
 <td style="text-align:right;">
 526
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+66
 </td>
 </tr>
 <tr>
@@ -1315,6 +1885,12 @@ Lençóis Paulista
 <td style="text-align:right;">
 519
 </td>
+<td style="text-align:right;">
+34
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1322,6 +1898,12 @@ Orlândia
 </td>
 <td style="text-align:right;">
 518
+</td>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -1331,6 +1913,12 @@ Jacareí
 <td style="text-align:right;">
 489
 </td>
+<td style="text-align:right;">
+67
+</td>
+<td style="text-align:right;">
+7
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1338,6 +1926,12 @@ Fernandópolis
 </td>
 <td style="text-align:right;">
 478
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+16
 </td>
 </tr>
 <tr>
@@ -1347,6 +1941,12 @@ Mairiporã
 <td style="text-align:right;">
 476
 </td>
+<td style="text-align:right;">
+39
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1354,6 +1954,12 @@ Vinhedo
 </td>
 <td style="text-align:right;">
 476
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+16
 </td>
 </tr>
 <tr>
@@ -1363,6 +1969,12 @@ Amparo
 <td style="text-align:right;">
 472
 </td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1370,6 +1982,12 @@ Tupã
 </td>
 <td style="text-align:right;">
 469
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+21
 </td>
 </tr>
 <tr>
@@ -1379,6 +1997,12 @@ Pirassununga
 <td style="text-align:right;">
 462
 </td>
+<td style="text-align:right;">
+35
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1386,6 +2010,12 @@ Capão Bonito
 </td>
 <td style="text-align:right;">
 453
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+18
 </td>
 </tr>
 <tr>
@@ -1395,6 +2025,12 @@ Peruíbe
 <td style="text-align:right;">
 453
 </td>
+<td style="text-align:right;">
+41
+</td>
+<td style="text-align:right;">
+11
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1402,6 +2038,12 @@ Itapira
 </td>
 <td style="text-align:right;">
 435
+</td>
+<td style="text-align:right;">
+34
+</td>
+<td style="text-align:right;">
+13
 </td>
 </tr>
 <tr>
@@ -1411,6 +2053,12 @@ Pederneiras
 <td style="text-align:right;">
 429
 </td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1418,6 +2066,12 @@ Araçoiaba da Serra
 </td>
 <td style="text-align:right;">
 428
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -1427,6 +2081,12 @@ Jardinópolis
 <td style="text-align:right;">
 428
 </td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1434,6 +2094,12 @@ Colina
 </td>
 <td style="text-align:right;">
 427
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+33
 </td>
 </tr>
 <tr>
@@ -1443,6 +2109,12 @@ Jaguariúna
 <td style="text-align:right;">
 417
 </td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+11
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1450,6 +2122,12 @@ Jaguariúna
 </td>
 <td style="text-align:right;">
 416
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+30
 </td>
 </tr>
 <tr>
@@ -1459,6 +2137,12 @@ Promissão
 <td style="text-align:right;">
 413
 </td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1466,6 +2150,12 @@ Buri
 </td>
 <td style="text-align:right;">
 399
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -1475,6 +2165,12 @@ Socorro
 <td style="text-align:right;">
 390
 </td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1482,6 +2178,12 @@ São Manuel
 </td>
 <td style="text-align:right;">
 388
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+30
 </td>
 </tr>
 <tr>
@@ -1491,6 +2193,12 @@ Jaboticabal
 <td style="text-align:right;">
 381
 </td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1498,6 +2206,12 @@ Santa Gertrudes
 </td>
 <td style="text-align:right;">
 381
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+25
 </td>
 </tr>
 <tr>
@@ -1507,6 +2221,12 @@ Pilar do Sul
 <td style="text-align:right;">
 374
 </td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+27
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1514,6 +2234,12 @@ Embu-Guaçu
 </td>
 <td style="text-align:right;">
 373
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:right;">
+11
 </td>
 </tr>
 <tr>
@@ -1523,6 +2249,12 @@ Pradópolis
 <td style="text-align:right;">
 366
 </td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+37
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1530,6 +2262,12 @@ Pitangueiras
 </td>
 <td style="text-align:right;">
 364
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+23
 </td>
 </tr>
 <tr>
@@ -1539,6 +2277,12 @@ Louveira
 <td style="text-align:right;">
 362
 </td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1546,6 +2290,12 @@ Monte Aprazível
 </td>
 <td style="text-align:right;">
 362
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+28
 </td>
 </tr>
 <tr>
@@ -1555,6 +2305,12 @@ Guaíra
 <td style="text-align:right;">
 351
 </td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1562,6 +2318,12 @@ Itápolis
 </td>
 <td style="text-align:right;">
 351
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -1571,6 +2333,12 @@ Piraju
 <td style="text-align:right;">
 349
 </td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1578,6 +2346,12 @@ Pedreira
 </td>
 <td style="text-align:right;">
 344
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -1587,6 +2361,12 @@ São Pedro
 <td style="text-align:right;">
 334
 </td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+18
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1594,6 +2374,12 @@ Miguelópolis
 </td>
 <td style="text-align:right;">
 330
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+28
 </td>
 </tr>
 <tr>
@@ -1603,6 +2389,12 @@ Viradouro
 <td style="text-align:right;">
 328
 </td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1610,6 +2402,12 @@ Lins
 </td>
 <td style="text-align:right;">
 326
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+13
 </td>
 </tr>
 <tr>
@@ -1619,6 +2417,12 @@ Itaí
 <td style="text-align:right;">
 317
 </td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+35
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1626,6 +2430,12 @@ Taquarituba
 </td>
 <td style="text-align:right;">
 317
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -1635,6 +2445,12 @@ Piedade
 <td style="text-align:right;">
 316
 </td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+11
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1642,6 +2458,12 @@ Altinópolis
 </td>
 <td style="text-align:right;">
 315
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+29
 </td>
 </tr>
 <tr>
@@ -1651,6 +2473,12 @@ Santa Fé do Sul
 <td style="text-align:right;">
 314
 </td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1658,6 +2486,12 @@ Juquitiba
 </td>
 <td style="text-align:right;">
 313
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -1667,6 +2501,12 @@ Guararema
 <td style="text-align:right;">
 312
 </td>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1674,6 +2514,12 @@ Severínia
 </td>
 <td style="text-align:right;">
 311
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -1683,6 +2529,12 @@ Rio Grande da Serra
 <td style="text-align:right;">
 307
 </td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1690,6 +2542,12 @@ Tremembé
 </td>
 <td style="text-align:right;">
 305
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -1699,6 +2557,12 @@ Guapiaçu
 <td style="text-align:right;">
 302
 </td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+30
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1706,6 +2570,12 @@ Salto de Pirapora
 </td>
 <td style="text-align:right;">
 298
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+14
 </td>
 </tr>
 <tr>
@@ -1715,6 +2585,12 @@ Santa Branca
 <td style="text-align:right;">
 298
 </td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+25
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1722,6 +2598,12 @@ Capela do Alto
 </td>
 <td style="text-align:right;">
 294
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -1731,6 +2613,12 @@ José Bonifácio
 <td style="text-align:right;">
 294
 </td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+18
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1738,6 +2626,12 @@ Pereira Barreto
 </td>
 <td style="text-align:right;">
 291
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+19
 </td>
 </tr>
 <tr>
@@ -1747,6 +2641,12 @@ Cesário Lange
 <td style="text-align:right;">
 289
 </td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1754,6 +2654,12 @@ Monte Alto
 </td>
 <td style="text-align:right;">
 285
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+14
 </td>
 </tr>
 <tr>
@@ -1763,6 +2669,12 @@ Tarumã
 <td style="text-align:right;">
 284
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+36
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1770,6 +2682,12 @@ Mirante do Paranapanema
 </td>
 <td style="text-align:right;">
 282
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+28
 </td>
 </tr>
 <tr>
@@ -1779,6 +2697,12 @@ Batatais
 <td style="text-align:right;">
 281
 </td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1786,6 +2710,12 @@ São João da Boa Vista
 </td>
 <td style="text-align:right;">
 281
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+10
 </td>
 </tr>
 <tr>
@@ -1795,6 +2725,12 @@ Piracaia
 <td style="text-align:right;">
 280
 </td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1802,6 +2738,12 @@ Brotas
 </td>
 <td style="text-align:right;">
 279
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -1811,6 +2753,12 @@ Rio das Pedras
 <td style="text-align:right;">
 278
 </td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1818,6 +2766,12 @@ Cândido Mota
 </td>
 <td style="text-align:right;">
 277
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+46
 </td>
 </tr>
 <tr>
@@ -1827,6 +2781,12 @@ Miracatu
 <td style="text-align:right;">
 273
 </td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1834,6 +2794,12 @@ Rancharia
 </td>
 <td style="text-align:right;">
 273
+</td>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+12
 </td>
 </tr>
 <tr>
@@ -1843,6 +2809,12 @@ Bariri
 <td style="text-align:right;">
 271
 </td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1850,6 +2822,12 @@ Engenheiro Coelho
 </td>
 <td style="text-align:right;">
 269
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+38
 </td>
 </tr>
 <tr>
@@ -1859,6 +2837,12 @@ Osvaldo Cruz
 <td style="text-align:right;">
 269
 </td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1866,6 +2850,12 @@ Iracemápolis
 </td>
 <td style="text-align:right;">
 266
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+33
 </td>
 </tr>
 <tr>
@@ -1875,6 +2865,12 @@ Iracemápolis
 <td style="text-align:right;">
 262
 </td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1882,6 +2878,12 @@ Espírito Santo do Pinhal
 </td>
 <td style="text-align:right;">
 262
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+12
 </td>
 </tr>
 <tr>
@@ -1891,6 +2893,12 @@ Igarapava
 <td style="text-align:right;">
 259
 </td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1898,6 +2906,12 @@ Iguape
 </td>
 <td style="text-align:right;">
 257
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+14
 </td>
 </tr>
 <tr>
@@ -1907,6 +2921,12 @@ Martinópolis
 <td style="text-align:right;">
 257
 </td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1914,6 +2934,12 @@ Igaraçu do Tietê
 </td>
 <td style="text-align:right;">
 256
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+28
 </td>
 </tr>
 <tr>
@@ -1923,6 +2949,12 @@ Santa Cruz das Palmeiras
 <td style="text-align:right;">
 254
 </td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+28
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1930,6 +2962,12 @@ Santa Rita do Passa Quatro
 </td>
 <td style="text-align:right;">
 254
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+15
 </td>
 </tr>
 <tr>
@@ -1939,6 +2977,12 @@ Eldorado
 <td style="text-align:right;">
 253
 </td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+9
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1946,6 +2990,12 @@ Pinhalzinho
 </td>
 <td style="text-align:right;">
 253
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+19
 </td>
 </tr>
 <tr>
@@ -1955,6 +3005,12 @@ Roseira
 <td style="text-align:right;">
 250
 </td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1962,6 +3018,12 @@ Nova Odessa
 </td>
 <td style="text-align:right;">
 249
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+12
 </td>
 </tr>
 <tr>
@@ -1971,6 +3033,12 @@ Junqueirópolis
 <td style="text-align:right;">
 246
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+31
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1978,6 +3046,12 @@ Cajobi
 </td>
 <td style="text-align:right;">
 243
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+27
 </td>
 </tr>
 <tr>
@@ -1987,6 +3061,12 @@ Potirendaba
 <td style="text-align:right;">
 243
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+40
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1994,6 +3074,12 @@ Conchas
 </td>
 <td style="text-align:right;">
 241
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+19
 </td>
 </tr>
 <tr>
@@ -2003,6 +3089,12 @@ Descalvado
 <td style="text-align:right;">
 241
 </td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+10
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2010,6 +3102,12 @@ Guararapes
 </td>
 <td style="text-align:right;">
 241
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+13
 </td>
 </tr>
 <tr>
@@ -2019,6 +3117,12 @@ Castilho
 <td style="text-align:right;">
 240
 </td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2026,6 +3130,12 @@ Taguaí
 </td>
 <td style="text-align:right;">
 238
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+30
 </td>
 </tr>
 <tr>
@@ -2035,6 +3145,12 @@ Brodowski
 <td style="text-align:right;">
 234
 </td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2042,6 +3158,12 @@ Cravinhos
 </td>
 <td style="text-align:right;">
 225
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -2051,6 +3173,12 @@ Santa Rosa de Viterbo
 <td style="text-align:right;">
 224
 </td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2058,6 +3186,12 @@ Teodoro Sampaio
 </td>
 <td style="text-align:right;">
 224
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -2067,6 +3201,12 @@ Potim
 <td style="text-align:right;">
 218
 </td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2074,6 +3214,12 @@ Vargem Grande do Sul
 </td>
 <td style="text-align:right;">
 218
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -2083,6 +3229,12 @@ Guaraci
 <td style="text-align:right;">
 217
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+27
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2090,6 +3242,12 @@ Jacupiranga
 </td>
 <td style="text-align:right;">
 217
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+14
 </td>
 </tr>
 <tr>
@@ -2099,6 +3257,12 @@ Bady Bassitt
 <td style="text-align:right;">
 216
 </td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2106,6 +3270,12 @@ Ipuã
 </td>
 <td style="text-align:right;">
 214
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+19
 </td>
 </tr>
 <tr>
@@ -2115,6 +3285,12 @@ Dois Córregos
 <td style="text-align:right;">
 213
 </td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2122,6 +3298,12 @@ Cajati
 </td>
 <td style="text-align:right;">
 212
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+12
 </td>
 </tr>
 <tr>
@@ -2131,6 +3313,12 @@ Estiva Gerbi
 <td style="text-align:right;">
 209
 </td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2138,6 +3326,12 @@ Nova Campina
 </td>
 <td style="text-align:right;">
 205
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+19
 </td>
 </tr>
 <tr>
@@ -2147,6 +3341,12 @@ Guaiçara
 <td style="text-align:right;">
 204
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2154,6 +3354,12 @@ Tambaú
 </td>
 <td style="text-align:right;">
 201
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+13
 </td>
 </tr>
 <tr>
@@ -2163,6 +3369,12 @@ Ipaussu
 <td style="text-align:right;">
 196
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2170,6 +3382,12 @@ Mirassol
 </td>
 <td style="text-align:right;">
 195
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+10
 </td>
 </tr>
 <tr>
@@ -2179,6 +3397,12 @@ Itatinga
 <td style="text-align:right;">
 194
 </td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2186,6 +3410,12 @@ Laranjal Paulista
 </td>
 <td style="text-align:right;">
 194
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+15
 </td>
 </tr>
 <tr>
@@ -2195,6 +3425,12 @@ Cordeirópolis
 <td style="text-align:right;">
 193
 </td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2202,6 +3438,12 @@ Adamantina
 </td>
 <td style="text-align:right;">
 191
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+14
 </td>
 </tr>
 <tr>
@@ -2211,6 +3453,12 @@ Ilha Solteira
 <td style="text-align:right;">
 191
 </td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2218,6 +3466,12 @@ Monte Azul Paulista
 </td>
 <td style="text-align:right;">
 191
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+21
 </td>
 </tr>
 <tr>
@@ -2227,6 +3481,12 @@ Ribeirão Bonito
 <td style="text-align:right;">
 191
 </td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2234,6 +3494,12 @@ Ibirá
 </td>
 <td style="text-align:right;">
 190
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+48
 </td>
 </tr>
 <tr>
@@ -2243,6 +3509,12 @@ Guará
 <td style="text-align:right;">
 188
 </td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2250,6 +3522,12 @@ Pompéia
 </td>
 <td style="text-align:right;">
 187
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+27
 </td>
 </tr>
 <tr>
@@ -2259,6 +3537,12 @@ Uchoa
 <td style="text-align:right;">
 187
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+31
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2266,6 +3550,12 @@ Angatuba
 </td>
 <td style="text-align:right;">
 183
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+18
 </td>
 </tr>
 <tr>
@@ -2275,6 +3565,12 @@ Itajobi
 <td style="text-align:right;">
 183
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+23
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2282,6 +3578,12 @@ Luís Antônio
 </td>
 <td style="text-align:right;">
 182
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -2291,6 +3593,12 @@ Areiópolis
 <td style="text-align:right;">
 181
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+30
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2298,6 +3606,12 @@ Charqueada
 </td>
 <td style="text-align:right;">
 181
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+23
 </td>
 </tr>
 <tr>
@@ -2307,6 +3621,12 @@ Cedral
 <td style="text-align:right;">
 180
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+60
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2314,6 +3634,12 @@ Elias Fausto
 </td>
 <td style="text-align:right;">
 180
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -2323,6 +3649,12 @@ Holambra
 <td style="text-align:right;">
 180
 </td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2330,6 +3662,12 @@ Santa Adélia
 </td>
 <td style="text-align:right;">
 180
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+15
 </td>
 </tr>
 <tr>
@@ -2339,6 +3677,12 @@ Jaborandi
 <td style="text-align:right;">
 179
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+45
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2346,6 +3690,12 @@ Cerqueira César
 </td>
 <td style="text-align:right;">
 177
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -2355,6 +3705,12 @@ Fartura
 <td style="text-align:right;">
 174
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+22
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2362,6 +3718,12 @@ Morungaba
 </td>
 <td style="text-align:right;">
 174
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+19
 </td>
 </tr>
 <tr>
@@ -2371,6 +3733,12 @@ Palmital
 <td style="text-align:right;">
 174
 </td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2378,6 +3746,12 @@ Tanabi
 </td>
 <td style="text-align:right;">
 174
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -2387,6 +3761,12 @@ Caconde
 <td style="text-align:right;">
 173
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+29
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2394,6 +3774,12 @@ Ouroeste
 </td>
 <td style="text-align:right;">
 171
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+28
 </td>
 </tr>
 <tr>
@@ -2403,6 +3789,12 @@ Palestina
 <td style="text-align:right;">
 171
 </td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2410,6 +3802,12 @@ Boa Esperança do Sul
 </td>
 <td style="text-align:right;">
 170
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+21
 </td>
 </tr>
 <tr>
@@ -2419,6 +3817,12 @@ Tupi Paulista
 <td style="text-align:right;">
 170
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+42
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2426,6 +3830,12 @@ Taquarivaí
 </td>
 <td style="text-align:right;">
 166
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+28
 </td>
 </tr>
 <tr>
@@ -2435,6 +3845,12 @@ Sete Barras
 <td style="text-align:right;">
 164
 </td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+9
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2442,6 +3858,12 @@ Urupês
 </td>
 <td style="text-align:right;">
 164
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+33
 </td>
 </tr>
 <tr>
@@ -2451,6 +3873,12 @@ Bastos
 <td style="text-align:right;">
 163
 </td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+18
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2458,6 +3886,12 @@ Valentim Gentil
 </td>
 <td style="text-align:right;">
 162
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+81
 </td>
 </tr>
 <tr>
@@ -2467,6 +3901,12 @@ Panorama
 <td style="text-align:right;">
 161
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2474,6 +3914,12 @@ Presidente Bernardes
 </td>
 <td style="text-align:right;">
 161
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+23
 </td>
 </tr>
 <tr>
@@ -2483,6 +3929,12 @@ Ouro Verde
 <td style="text-align:right;">
 159
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+32
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2490,6 +3942,12 @@ Chavantes
 </td>
 <td style="text-align:right;">
 159
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+14
 </td>
 </tr>
 <tr>
@@ -2499,6 +3957,12 @@ Colômbia
 <td style="text-align:right;">
 156
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2506,6 +3970,12 @@ Arealva
 </td>
 <td style="text-align:right;">
 151
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -2515,6 +3985,12 @@ Nuporanga
 <td style="text-align:right;">
 151
 </td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+22
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2522,6 +3998,12 @@ Buritama
 </td>
 <td style="text-align:right;">
 150
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+19
 </td>
 </tr>
 <tr>
@@ -2531,6 +4013,12 @@ Manduri
 <td style="text-align:right;">
 150
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+25
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2538,6 +4026,12 @@ Rosana
 </td>
 <td style="text-align:right;">
 147
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+21
 </td>
 </tr>
 <tr>
@@ -2547,6 +4041,12 @@ Sarapuí
 <td style="text-align:right;">
 146
 </td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2554,6 +4054,12 @@ Pariquera-Açu
 </td>
 <td style="text-align:right;">
 145
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+12
 </td>
 </tr>
 <tr>
@@ -2563,6 +4069,12 @@ Santo Antônio do Aracanguá
 <td style="text-align:right;">
 144
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+29
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2570,6 +4082,12 @@ Riolândia
 </td>
 <td style="text-align:right;">
 141
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+28
 </td>
 </tr>
 <tr>
@@ -2579,6 +4097,12 @@ Rincão
 <td style="text-align:right;">
 140
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+23
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2586,6 +4110,12 @@ São Bento do Sapucaí
 </td>
 <td style="text-align:right;">
 135
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+14
 </td>
 </tr>
 <tr>
@@ -2595,6 +4125,12 @@ Clementina
 <td style="text-align:right;">
 132
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2602,6 +4138,12 @@ Macatuba
 </td>
 <td style="text-align:right;">
 131
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+26
 </td>
 </tr>
 <tr>
@@ -2611,6 +4153,12 @@ Iacanga
 <td style="text-align:right;">
 130
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+32
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2618,6 +4166,12 @@ Pirajuí
 </td>
 <td style="text-align:right;">
 130
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+12
 </td>
 </tr>
 <tr>
@@ -2627,6 +4181,12 @@ Restinga
 <td style="text-align:right;">
 129
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+32
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2634,6 +4194,12 @@ Pedregulho
 </td>
 <td style="text-align:right;">
 128
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+8
 </td>
 </tr>
 <tr>
@@ -2643,6 +4209,12 @@ Euclides da Cunha Paulista
 <td style="text-align:right;">
 127
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2650,6 +4222,12 @@ Santo Anastácio
 </td>
 <td style="text-align:right;">
 125
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+18
 </td>
 </tr>
 <tr>
@@ -2659,6 +4237,12 @@ Mineiros do Tietê
 <td style="text-align:right;">
 123
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2666,6 +4250,12 @@ Duartina
 </td>
 <td style="text-align:right;">
 122
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -2675,6 +4265,12 @@ Palmares Paulista
 <td style="text-align:right;">
 122
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2682,6 +4278,12 @@ Tuiuti
 </td>
 <td style="text-align:right;">
 122
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -2691,6 +4293,12 @@ Cardoso
 <td style="text-align:right;">
 121
 </td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2698,6 +4306,12 @@ Cristais Paulista
 </td>
 <td style="text-align:right;">
 121
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+40
 </td>
 </tr>
 <tr>
@@ -2707,6 +4321,12 @@ Queluz
 <td style="text-align:right;">
 120
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2714,6 +4334,12 @@ Barra do Turvo
 </td>
 <td style="text-align:right;">
 119
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+15
 </td>
 </tr>
 <tr>
@@ -2723,6 +4349,12 @@ Dourado
 <td style="text-align:right;">
 119
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2730,6 +4362,12 @@ Quatá
 </td>
 <td style="text-align:right;">
 118
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -2739,6 +4377,12 @@ Bernardino de Campos
 <td style="text-align:right;">
 117
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2746,6 +4390,12 @@ Nova Aliança
 </td>
 <td style="text-align:right;">
 117
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -2755,6 +4405,12 @@ Dumont
 <td style="text-align:right;">
 115
 </td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2762,6 +4418,12 @@ Fernando Prestes
 </td>
 <td style="text-align:right;">
 115
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+16
 </td>
 </tr>
 <tr>
@@ -2771,6 +4433,12 @@ Flórida Paulista
 <td style="text-align:right;">
 115
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+38
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2778,6 +4446,12 @@ São Lourenço da Serra
 </td>
 <td style="text-align:right;">
 114
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+9
 </td>
 </tr>
 <tr>
@@ -2787,6 +4461,12 @@ Piacatu
 <td style="text-align:right;">
 112
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+37
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2794,6 +4474,12 @@ Barbosa
 </td>
 <td style="text-align:right;">
 109
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+27
 </td>
 </tr>
 <tr>
@@ -2803,6 +4489,12 @@ Itariri
 <td style="text-align:right;">
 109
 </td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+11
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2810,6 +4502,12 @@ Piquete
 </td>
 <td style="text-align:right;">
 109
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+18
 </td>
 </tr>
 <tr>
@@ -2819,6 +4517,12 @@ Santo Antônio do Pinhal
 <td style="text-align:right;">
 108
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2826,6 +4530,12 @@ Jambeiro
 </td>
 <td style="text-align:right;">
 107
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+27
 </td>
 </tr>
 <tr>
@@ -2835,6 +4545,12 @@ Lavrinhas
 <td style="text-align:right;">
 107
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+18
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2842,6 +4558,12 @@ Quintana
 </td>
 <td style="text-align:right;">
 106
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+35
 </td>
 </tr>
 <tr>
@@ -2851,6 +4573,12 @@ Cássia dos Coqueiros
 <td style="text-align:right;">
 105
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2858,6 +4586,12 @@ Orindiúva
 </td>
 <td style="text-align:right;">
 105
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+21
 </td>
 </tr>
 <tr>
@@ -2867,6 +4601,12 @@ Ariranha
 <td style="text-align:right;">
 103
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2874,6 +4614,12 @@ Canas
 </td>
 <td style="text-align:right;">
 101
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -2883,6 +4629,12 @@ Canitar
 <td style="text-align:right;">
 101
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+25
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2890,6 +4642,12 @@ Neves Paulista
 </td>
 <td style="text-align:right;">
 101
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -2899,6 +4657,12 @@ Guatapará
 <td style="text-align:right;">
 100
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2906,6 +4670,12 @@ Ipiguá
 </td>
 <td style="text-align:right;">
 100
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+33
 </td>
 </tr>
 <tr>
@@ -2915,6 +4685,12 @@ Tapiraí
 <td style="text-align:right;">
 100
 </td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2922,6 +4698,12 @@ Tejupá
 </td>
 <td style="text-align:right;">
 100
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+11
 </td>
 </tr>
 <tr>
@@ -2931,6 +4713,12 @@ Iaras
 <td style="text-align:right;">
 98
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2938,6 +4726,12 @@ Sales Oliveira
 </td>
 <td style="text-align:right;">
 97
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+48
 </td>
 </tr>
 <tr>
@@ -2947,6 +4741,12 @@ Icém
 <td style="text-align:right;">
 96
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2954,6 +4754,12 @@ Itapuí
 </td>
 <td style="text-align:right;">
 95
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -2963,6 +4769,12 @@ Pedra Bela
 <td style="text-align:right;">
 95
 </td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+11
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2970,6 +4782,12 @@ Bom Sucesso de Itararé
 </td>
 <td style="text-align:right;">
 94
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+31
 </td>
 </tr>
 <tr>
@@ -2979,6 +4797,12 @@ Rafard
 <td style="text-align:right;">
 94
 </td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2986,6 +4810,12 @@ Cafelândia
 </td>
 <td style="text-align:right;">
 93
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+12
 </td>
 </tr>
 <tr>
@@ -2995,6 +4825,12 @@ Gália
 <td style="text-align:right;">
 93
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+46
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3002,6 +4838,12 @@ Avanhandava
 </td>
 <td style="text-align:right;">
 92
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+13
 </td>
 </tr>
 <tr>
@@ -3011,6 +4853,12 @@ Espírito Santo do Turvo
 <td style="text-align:right;">
 92
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+23
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3018,6 +4866,12 @@ Mombuca
 </td>
 <td style="text-align:right;">
 92
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+23
 </td>
 </tr>
 <tr>
@@ -3027,6 +4881,12 @@ Taiúva
 <td style="text-align:right;">
 92
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+23
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3034,6 +4894,12 @@ Itaberá
 </td>
 <td style="text-align:right;">
 90
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+13
 </td>
 </tr>
 <tr>
@@ -3043,6 +4909,12 @@ Serra Azul
 <td style="text-align:right;">
 90
 </td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3050,6 +4922,12 @@ Riversul
 </td>
 <td style="text-align:right;">
 89
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -3059,6 +4937,12 @@ Américo de Campos
 <td style="text-align:right;">
 88
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+18
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3066,6 +4950,12 @@ João Ramalho
 </td>
 <td style="text-align:right;">
 88
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+29
 </td>
 </tr>
 <tr>
@@ -3075,6 +4965,12 @@ Pratânia
 <td style="text-align:right;">
 88
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+29
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3082,6 +4978,12 @@ Braúna
 </td>
 <td style="text-align:right;">
 87
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -3091,6 +4993,12 @@ Iepê
 <td style="text-align:right;">
 87
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+29
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3098,6 +5006,12 @@ Anhumas
 </td>
 <td style="text-align:right;">
 86
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -3107,6 +5021,12 @@ Bocaina
 <td style="text-align:right;">
 86
 </td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3114,6 +5034,12 @@ Pereiras
 </td>
 <td style="text-align:right;">
 86
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -3123,6 +5049,12 @@ Saltinho
 <td style="text-align:right;">
 86
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3130,6 +5062,12 @@ Caiabu
 </td>
 <td style="text-align:right;">
 85
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -3139,6 +5077,12 @@ Reginópolis
 <td style="text-align:right;">
 84
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+28
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3146,6 +5090,12 @@ Santópolis do Aguapeí
 </td>
 <td style="text-align:right;">
 84
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -3155,6 +5105,12 @@ Catiguá
 <td style="text-align:right;">
 83
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+28
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3162,6 +5118,12 @@ Cosmorama
 </td>
 <td style="text-align:right;">
 83
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+28
 </td>
 </tr>
 <tr>
@@ -3171,6 +5133,12 @@ Ubarana
 <td style="text-align:right;">
 83
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3178,6 +5146,12 @@ Pardinho
 </td>
 <td style="text-align:right;">
 82
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -3187,6 +5161,12 @@ Mendonça
 <td style="text-align:right;">
 81
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+27
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3194,6 +5174,12 @@ Dobrada
 </td>
 <td style="text-align:right;">
 80
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -3203,6 +5189,12 @@ Ipeúna
 <td style="text-align:right;">
 80
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3210,6 +5202,12 @@ Patrocínio Paulista
 </td>
 <td style="text-align:right;">
 80
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+13
 </td>
 </tr>
 <tr>
@@ -3219,6 +5217,12 @@ Aramina
 <td style="text-align:right;">
 79
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3226,6 +5230,12 @@ Paraíso
 </td>
 <td style="text-align:right;">
 79
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+26
 </td>
 </tr>
 <tr>
@@ -3235,6 +5245,12 @@ Taciba
 <td style="text-align:right;">
 79
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3242,6 +5258,12 @@ Bálsamo
 </td>
 <td style="text-align:right;">
 76
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+25
 </td>
 </tr>
 <tr>
@@ -3251,6 +5273,12 @@ Ribeirão do Sul
 <td style="text-align:right;">
 76
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+38
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3258,6 +5286,12 @@ Salto Grande
 </td>
 <td style="text-align:right;">
 76
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+15
 </td>
 </tr>
 <tr>
@@ -3267,6 +5301,12 @@ Irapuru
 <td style="text-align:right;">
 74
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+25
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3274,6 +5314,12 @@ Natividade da Serra
 </td>
 <td style="text-align:right;">
 73
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+12
 </td>
 </tr>
 <tr>
@@ -3283,6 +5329,12 @@ Coroados
 <td style="text-align:right;">
 72
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+18
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3290,6 +5342,12 @@ Gavião Peixoto
 </td>
 <td style="text-align:right;">
 72
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -3299,6 +5357,12 @@ Echaporã
 <td style="text-align:right;">
 71
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+36
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3306,6 +5370,12 @@ Santa Albertina
 </td>
 <td style="text-align:right;">
 71
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+24
 </td>
 </tr>
 <tr>
@@ -3315,6 +5385,12 @@ Getulina
 <td style="text-align:right;">
 70
 </td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3322,6 +5398,12 @@ Vista Alegre do Alto
 </td>
 <td style="text-align:right;">
 70
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+35
 </td>
 </tr>
 <tr>
@@ -3331,6 +5413,12 @@ Rinópolis
 <td style="text-align:right;">
 68
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3338,6 +5426,12 @@ Indiana
 </td>
 <td style="text-align:right;">
 67
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -3347,6 +5441,12 @@ Ocauçu
 <td style="text-align:right;">
 67
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+34
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3354,6 +5454,12 @@ Pirangi
 </td>
 <td style="text-align:right;">
 67
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+17
 </td>
 </tr>
 <tr>
@@ -3363,6 +5469,12 @@ Silveiras
 <td style="text-align:right;">
 66
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3370,6 +5482,12 @@ Alambari
 </td>
 <td style="text-align:right;">
 65
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+9
 </td>
 </tr>
 <tr>
@@ -3379,6 +5497,12 @@ Coronel Macedo
 <td style="text-align:right;">
 65
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+32
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3386,6 +5510,12 @@ Jeriquara
 </td>
 <td style="text-align:right;">
 65
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -3395,6 +5525,12 @@ Maracaí
 <td style="text-align:right;">
 64
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3402,6 +5538,12 @@ Mirassolândia
 </td>
 <td style="text-align:right;">
 64
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+13
 </td>
 </tr>
 <tr>
@@ -3411,6 +5553,12 @@ Irapuã
 <td style="text-align:right;">
 63
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3418,6 +5566,12 @@ Onda Verde
 </td>
 <td style="text-align:right;">
 62
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+16
 </td>
 </tr>
 <tr>
@@ -3427,6 +5581,12 @@ Santa Cruz da Esperança
 <td style="text-align:right;">
 61
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+20
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3434,6 +5594,12 @@ São José do Barreiro
 </td>
 <td style="text-align:right;">
 61
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+9
 </td>
 </tr>
 <tr>
@@ -3443,6 +5609,12 @@ Borborema
 <td style="text-align:right;">
 60
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3450,6 +5622,12 @@ Caiuá
 </td>
 <td style="text-align:right;">
 60
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -3459,6 +5637,12 @@ Caiuá
 <td style="text-align:right;">
 59
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+30
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3466,6 +5650,12 @@ Nova Luzitânia
 </td>
 <td style="text-align:right;">
 59
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+20
 </td>
 </tr>
 <tr>
@@ -3475,6 +5665,12 @@ Santa Ernestina
 <td style="text-align:right;">
 59
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3482,6 +5678,12 @@ Vera Cruz
 </td>
 <td style="text-align:right;">
 59
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+10
 </td>
 </tr>
 <tr>
@@ -3491,6 +5693,12 @@ Torrinha
 <td style="text-align:right;">
 58
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+29
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3498,6 +5706,12 @@ Nhandeara
 </td>
 <td style="text-align:right;">
 57
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+10
 </td>
 </tr>
 <tr>
@@ -3507,6 +5721,12 @@ Nhandeara
 <td style="text-align:right;">
 56
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+19
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3514,6 +5734,12 @@ Arandu
 </td>
 <td style="text-align:right;">
 56
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+11
 </td>
 </tr>
 <tr>
@@ -3523,6 +5749,12 @@ Rubiácea
 <td style="text-align:right;">
 55
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3530,6 +5762,12 @@ Urânia
 </td>
 <td style="text-align:right;">
 55
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+18
 </td>
 </tr>
 <tr>
@@ -3539,6 +5777,12 @@ Guzolândia
 <td style="text-align:right;">
 54
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+27
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3546,6 +5790,12 @@ Jaci
 </td>
 <td style="text-align:right;">
 54
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+11
 </td>
 </tr>
 <tr>
@@ -3555,6 +5805,12 @@ São Pedro do Turvo
 <td style="text-align:right;">
 54
 </td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+8
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3562,6 +5818,12 @@ Ubirajara
 </td>
 <td style="text-align:right;">
 54
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+18
 </td>
 </tr>
 <tr>
@@ -3571,6 +5833,12 @@ Areias
 <td style="text-align:right;">
 53
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+18
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3578,6 +5846,12 @@ Lavínia
 </td>
 <td style="text-align:right;">
 53
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+26
 </td>
 </tr>
 <tr>
@@ -3587,6 +5861,12 @@ Macedônia
 <td style="text-align:right;">
 53
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3594,6 +5874,12 @@ Meridiano
 </td>
 <td style="text-align:right;">
 53
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+13
 </td>
 </tr>
 <tr>
@@ -3603,6 +5889,12 @@ Oriente
 <td style="text-align:right;">
 53
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+26
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3610,6 +5902,12 @@ Marapoama
 </td>
 <td style="text-align:right;">
 52
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+26
 </td>
 </tr>
 <tr>
@@ -3619,6 +5917,12 @@ Corumbataí
 <td style="text-align:right;">
 51
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3626,6 +5930,12 @@ Aparecida d’Oeste
 </td>
 <td style="text-align:right;">
 50
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+25
 </td>
 </tr>
 <tr>
@@ -3635,6 +5945,12 @@ Cabrália Paulista
 <td style="text-align:right;">
 49
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3642,6 +5958,12 @@ Palmeira d’Oeste
 </td>
 <td style="text-align:right;">
 49
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+16
 </td>
 </tr>
 <tr>
@@ -3651,6 +5973,12 @@ Santo Expedito
 <td style="text-align:right;">
 49
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3659,10 +5987,22 @@ Bilac
 <td style="text-align:right;">
 48
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Paranapuã
+</td>
+<td style="text-align:right;">
+48
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 48
@@ -3675,6 +6015,12 @@ Taquaral
 <td style="text-align:right;">
 48
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3683,10 +6029,22 @@ Gabriel Monteiro
 <td style="text-align:right;">
 47
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+24
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Herculândia
+</td>
+<td style="text-align:right;">
+45
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 45
@@ -3699,6 +6057,12 @@ Alvinlândia
 <td style="text-align:right;">
 44
 </td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+11
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3706,6 +6070,12 @@ Campos Novos Paulista
 </td>
 <td style="text-align:right;">
 44
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -3715,6 +6085,12 @@ Nova Castilho
 <td style="text-align:right;">
 43
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3722,6 +6098,12 @@ Rifaina
 </td>
 <td style="text-align:right;">
 43
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+22
 </td>
 </tr>
 <tr>
@@ -3731,10 +6113,22 @@ Lagoinha
 <td style="text-align:right;">
 42
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Lutécia
+</td>
+<td style="text-align:right;">
+41
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 41
@@ -3747,6 +6141,12 @@ Macaubal
 <td style="text-align:right;">
 41
 </td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+41
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3754,6 +6154,12 @@ Monteiro Lobato
 </td>
 <td style="text-align:right;">
 41
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+7
 </td>
 </tr>
 <tr>
@@ -3763,6 +6169,12 @@ Estrela do Norte
 <td style="text-align:right;">
 40
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+8
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3770,6 +6182,12 @@ Itapirapuã Paulista
 </td>
 <td style="text-align:right;">
 40
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+10
 </td>
 </tr>
 <tr>
@@ -3779,10 +6197,22 @@ Mariápolis
 <td style="text-align:right;">
 39
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Redenção da Serra
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 37
@@ -3795,6 +6225,12 @@ Itaju
 <td style="text-align:right;">
 36
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3802,6 +6238,12 @@ Monte Castelo
 </td>
 <td style="text-align:right;">
 36
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+12
 </td>
 </tr>
 <tr>
@@ -3811,10 +6253,22 @@ Queiroz
 <td style="text-align:right;">
 35
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Floreal
+</td>
+<td style="text-align:right;">
+34
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 34
@@ -3827,6 +6281,12 @@ São João das Duas Pontes
 <td style="text-align:right;">
 33
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3834,6 +6294,12 @@ Parisi
 </td>
 <td style="text-align:right;">
 32
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+16
 </td>
 </tr>
 <tr>
@@ -3843,6 +6309,12 @@ São João de Iracema
 <td style="text-align:right;">
 32
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3850,6 +6322,12 @@ Ribeirão dos Índios
 </td>
 <td style="text-align:right;">
 31
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+10
 </td>
 </tr>
 <tr>
@@ -3859,6 +6337,12 @@ São João do Pau d’Alho
 <td style="text-align:right;">
 30
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3866,6 +6350,12 @@ Sebastianópolis do Sul
 </td>
 <td style="text-align:right;">
 30
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+8
 </td>
 </tr>
 <tr>
@@ -3875,6 +6365,12 @@ Itaóca
 <td style="text-align:right;">
 29
 </td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+6
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3882,6 +6378,12 @@ Piquerobi
 </td>
 <td style="text-align:right;">
 28
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+14
 </td>
 </tr>
 <tr>
@@ -3891,10 +6393,22 @@ Trabiju
 <td style="text-align:right;">
 28
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Borebi
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 27
@@ -3907,6 +6421,12 @@ Guarani d’Oeste
 <td style="text-align:right;">
 27
 </td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+27
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3914,6 +6434,12 @@ Sagres
 </td>
 <td style="text-align:right;">
 27
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+14
 </td>
 </tr>
 <tr>
@@ -3923,6 +6449,12 @@ Inúbia Paulista
 <td style="text-align:right;">
 26
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3931,10 +6463,22 @@ Gastão Vidigal
 <td style="text-align:right;">
 25
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Brejo Alegre
+</td>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 24
@@ -3947,6 +6491,12 @@ Fernão
 <td style="text-align:right;">
 23
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3954,6 +6504,12 @@ Magda
 </td>
 <td style="text-align:right;">
 23
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+12
 </td>
 </tr>
 <tr>
@@ -3963,6 +6519,12 @@ Torre de Pedra
 <td style="text-align:right;">
 23
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3970,6 +6532,12 @@ Embaúba
 </td>
 <td style="text-align:right;">
 22
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+7
 </td>
 </tr>
 <tr>
@@ -3979,10 +6547,22 @@ Florínia
 <td style="text-align:right;">
 22
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+11
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Arco-Íris
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 21
@@ -3995,6 +6575,12 @@ Santa Clara d’Oeste
 <td style="text-align:right;">
 21
 </td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+21
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4002,6 +6588,12 @@ Alfredo Marcondes
 </td>
 <td style="text-align:right;">
 20
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+10
 </td>
 </tr>
 <tr>
@@ -4011,10 +6603,22 @@ Alto Alegre
 <td style="text-align:right;">
 20
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+7
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Mesópolis
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 20
@@ -4027,6 +6631,12 @@ Pedrinhas Paulista
 <td style="text-align:right;">
 20
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+7
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4034,6 +6644,12 @@ Pracinha
 </td>
 <td style="text-align:right;">
 20
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+10
 </td>
 </tr>
 <tr>
@@ -4043,6 +6659,12 @@ Uru
 <td style="text-align:right;">
 19
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+10
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4050,6 +6672,12 @@ Lucianópolis
 </td>
 <td style="text-align:right;">
 18
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+9
 </td>
 </tr>
 <tr>
@@ -4059,6 +6687,12 @@ Monções
 <td style="text-align:right;">
 18
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+9
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4067,10 +6701,22 @@ Bento de Abreu
 <td style="text-align:right;">
 17
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+8
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Marinópolis
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 16
@@ -4083,6 +6729,12 @@ Murutinga do Sul
 <td style="text-align:right;">
 16
 </td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4090,6 +6742,12 @@ Divinolândia
 </td>
 <td style="text-align:right;">
 15
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+8
 </td>
 </tr>
 <tr>
@@ -4099,6 +6757,12 @@ Balbinos
 <td style="text-align:right;">
 14
 </td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+5
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4107,10 +6771,22 @@ Presidente Alves
 <td style="text-align:right;">
 14
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+7
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Aspásia
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 13
@@ -4123,6 +6799,12 @@ Casa Branca
 <td style="text-align:right;">
 12
 </td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+2
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4130,6 +6812,12 @@ Santa Salete
 </td>
 <td style="text-align:right;">
 12
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
 </td>
 </tr>
 <tr>
@@ -4139,6 +6827,12 @@ Vitória Brasil
 <td style="text-align:right;">
 12
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4147,10 +6841,22 @@ Borá
 <td style="text-align:right;">
 9
 </td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Dirce Reis
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 9
@@ -4163,10 +6869,22 @@ Santana da Ponte Pensa
 <td style="text-align:right;">
 6
 </td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+6
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Vargem
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 1
@@ -4178,6 +6896,12 @@ Total
 </td>
 <td style="text-align:right;">
 245573
+</td>
+<td style="text-align:right;">
+9241
+</td>
+<td style="text-align:right;">
+24148
 </td>
 </tr>
 </tbody>

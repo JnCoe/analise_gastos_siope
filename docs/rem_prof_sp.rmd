@@ -87,6 +87,14 @@ as.data.frame(colSums(is.na(rem_prof_sp)))
 ```
 <br>
 
+### Quantas escolas constam no arquivo?
+```{r}
+rem_prof_sp %>%
+  distinct(CO_MUNICIPIO, LOCAL_EXERCICIO) %>%
+  nrow()
+```
+
+
 ### Quais são as categorias profissionais que constam no arquivo?
 
 ```{r}
@@ -101,13 +109,15 @@ data.frame("Categorias" = categorias) %>%
 ```
 
 
-### Distribuição de funcionários por município
+### Distribuição de funcionários e escolas por município
 
 ```{r}
 rem_prof_sp %>%
   filter(ME_EXERCICIO == "06") %>%
   group_by(CO_MUNICIPIO ,NO_MUNICIPIO) %>%
-  summarise(qtde_funcionarios = n_distinct(NO_PROFISSIONAL)) %>%
+  summarise(qtde_funcionarios = n_distinct(NO_PROFISSIONAL),
+            qtde_escolas = n_distinct(LOCAL_EXERCICIO),
+            media_funcionario_escola = round(qtde_funcionarios/qtde_escolas, 0)) %>%
   ungroup() %>%
   select(-c(CO_MUNICIPIO)) %>%
   arrange(desc(qtde_funcionarios)) %>%
