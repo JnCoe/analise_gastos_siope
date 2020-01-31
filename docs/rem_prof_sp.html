@@ -302,7 +302,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Análise remuneralção professores no estado de São Paulo</h1>
 <h4 class="author"><em>Jessica Voigt</em></h4>
-<h4 class="date"><em>29 de janeiro de 2020</em></h4>
+<h4 class="date"><em>31 de janeiro de 2020</em></h4>
 
 </div>
 
@@ -447,34 +447,18 @@ load(&quot;~/R-Projects/qualidade_gastos_educação/analise_gastos_siope/data/re
 ## VL_TOTAL                                        0</code></pre>
 <p><br></p>
 </div>
-<div id="quantos-funcionarios-constam-no-arquivo-e-media-salarial" class="section level3">
-<h3>Quantos funcionários constam no arquivo e média salarial?</h3>
-<p>Como não temos dados de RG ou CPF, temos que verificar pelo nome, filtrados por município.</p>
-<pre class="r"><code>rem_prof_sp %&gt;% 
-  distinct(CO_MUNICIPIO, CATEG_PROFISSIONAL, NO_PROFISSIONAL, .keep_all = TRUE) %&gt;%
-  group_by(CATEG_PROFISSIONAL) %&gt;%
-  summarise(qtde_funcionarios = n(),
-            media_salarial = round(mean(VL_SALARIO),0)) %&gt;%
-  ungroup() %&gt;%
-  arrange(desc(qtde_funcionarios)) %&gt;%
-  mutate(perc = round(qtde_funcionarios/324338, 2)) %&gt;%
-  adorn_totals(&quot;row&quot;) %&gt;%
-  kable() %&gt;% 
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;,&quot;responsive&quot;))</code></pre>
-<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<div id="quais-sao-as-categorias-profissionais-que-constam-no-arquivo" class="section level3">
+<h3>Quais são as categorias profissionais que constam no arquivo?</h3>
+<pre class="r"><code>categorias &lt;- unique(rem_prof_sp$CATEG_PROFISSIONAL)
+
+data.frame(&quot;Categorias&quot; = categorias) %&gt;%
+  kable() %&gt;%
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:left;">
-CATEG_PROFISSIONAL
-</th>
-<th style="text-align:right;">
-qtde_funcionarios
-</th>
-<th style="text-align:right;">
-media_salarial
-</th>
-<th style="text-align:right;">
-perc
+Categorias
 </th>
 </tr>
 </thead>
@@ -483,224 +467,3709 @@ perc
 <td style="text-align:left;">
 Docente habilitado em curso de pedagogia
 </td>
-<td style="text-align:right;">
-130846
-</td>
-<td style="text-align:right;">
-3511
-</td>
-<td style="text-align:right;">
-0.40
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente habilitado em curso de licenciatura plena
-</td>
-<td style="text-align:right;">
-60165
-</td>
-<td style="text-align:right;">
-3410
-</td>
-<td style="text-align:right;">
-0.19
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Profissionais em efetivo exercício no âmbito da educação infantil e ensino fundamental.
-</td>
-<td style="text-align:right;">
-31964
-</td>
-<td style="text-align:right;">
-3794
-</td>
-<td style="text-align:right;">
-0.10
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Auxiliar/Assistente Educacional
-</td>
-<td style="text-align:right;">
-30773
-</td>
-<td style="text-align:right;">
-1779
-</td>
-<td style="text-align:right;">
-0.09
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Profissionais que exercem funções de secretaria escolar, alimentação escolar (merendeiras), multimei
-</td>
-<td style="text-align:right;">
-29900
-</td>
-<td style="text-align:right;">
-1677
-</td>
-<td style="text-align:right;">
-0.09
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Profissionais que atuam na realização das atividades requeridos nos ambientes de secretaria, de manu
-</td>
-<td style="text-align:right;">
-16140
-</td>
-<td style="text-align:right;">
-1580
-</td>
-<td style="text-align:right;">
-0.05
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente habilitado em curso de nível médio
-</td>
-<td style="text-align:right;">
-15675
-</td>
-<td style="text-align:right;">
-2678
-</td>
-<td style="text-align:right;">
-0.05
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente pós-graduado em cursos de especialização para formação de docentes para educação profissiona
-</td>
-<td style="text-align:right;">
-6184
-</td>
-<td style="text-align:right;">
-2933
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Docente habilitado em programa especial de formação pedagogica de docentes
-</td>
-<td style="text-align:right;">
-1436
-</td>
-<td style="text-align:right;">
-2646
-</td>
-<td style="text-align:right;">
-0.00
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Profissionais graduados, bacharéis e tecnólogos autorizados a atuar como docentes, em caráter precár
 </td>
-<td style="text-align:right;">
-525
-</td>
-<td style="text-align:right;">
-2946
-</td>
-<td style="text-align:right;">
-0.00
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente habilitado em curso de licenciatura plena
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Docente graduado bacharél e tecnólogo com diploma de mestrado ou doutorado na área do componente cur
-</td>
-<td style="text-align:right;">
-288
-</td>
-<td style="text-align:right;">
-3354
-</td>
-<td style="text-align:right;">
-0.00
+Profissionais em efetivo exercício no âmbito da educação infantil e ensino fundamental.
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Profissionais não habilitados, porém autorizados a exercer a docência em caráter precário e provisór
+Profissionais que exercem funções de secretaria escolar, alimentação escolar (merendeiras), multimei
 </td>
-<td style="text-align:right;">
-274
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente pós-graduado em cursos de especialização para formação de docentes para educação profissiona
 </td>
-<td style="text-align:right;">
-1472
+</tr>
+<tr>
+<td style="text-align:left;">
+Auxiliar/Assistente Educacional
 </td>
-<td style="text-align:right;">
-0.00
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente habilitado em curso de nível médio
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente habilitado em programa especial de formação pedagogica de docentes
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Docente instrutor, tradutor e intérprete de libras
 </td>
-<td style="text-align:right;">
-108
-</td>
-<td style="text-align:right;">
-2845
-</td>
-<td style="text-align:right;">
-0.00
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Profissionais experientes, não graduados, autorizados a atuar como docentes, em caráter precário e p
 </td>
-<td style="text-align:right;">
-51
-</td>
-<td style="text-align:right;">
-2204
-</td>
-<td style="text-align:right;">
-0.00
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente graduado bacharél e tecnólogo com diploma de mestrado ou doutorado na área do componente cur
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Docente professor indígena sem prévia formação pedagógica
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-2646
-</td>
-<td style="text-align:right;">
-0.00
+Profissionais não habilitados, porém autorizados a exercer a docência em caráter precário e provisór
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Docente professor de comunidade quilombola
 </td>
-<td style="text-align:right;">
-4
+</tr>
+<tr>
+<td style="text-align:left;">
+Docente professor indígena sem prévia formação pedagógica
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="distribuicao-de-funcionarios-por-municipio" class="section level3">
+<h3>Distribuição de funcionários por município</h3>
+<pre class="r"><code>rem_prof_sp %&gt;%
+  filter(ME_EXERCICIO == &quot;06&quot;) %&gt;%
+  group_by(CO_MUNICIPIO ,NO_MUNICIPIO) %&gt;%
+  summarise(qtde_funcionarios = n_distinct(NO_PROFISSIONAL)) %&gt;%
+  ungroup() %&gt;%
+  select(-c(CO_MUNICIPIO)) %&gt;%
+  arrange(desc(qtde_funcionarios)) %&gt;%
+  adorn_totals(&quot;row&quot;) %&gt;%
+  kable() %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;,&quot;responsive&quot;)) %&gt;%
+  scroll_box(width = &quot;700px&quot;, height = &quot;200px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:700px; ">
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+NO_MUNICIPIO
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+qtde_funcionarios
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+São Paulo
 </td>
 <td style="text-align:right;">
-3443
+50094
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guarulhos
 </td>
 <td style="text-align:right;">
-0.00
+7795
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Osasco
+</td>
+<td style="text-align:right;">
+5978
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Barueri
+</td>
+<td style="text-align:right;">
+5394
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Bernardo do Campo
+</td>
+<td style="text-align:right;">
+4863
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Campinas
+</td>
+<td style="text-align:right;">
+4720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sorocaba
+</td>
+<td style="text-align:right;">
+4491
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santo André
+</td>
+<td style="text-align:right;">
+4073
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São José dos Campos
+</td>
+<td style="text-align:right;">
+3004
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Piracicaba
+</td>
+<td style="text-align:right;">
+2735
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mogi das Cruzes
+</td>
+<td style="text-align:right;">
+2646
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São José do Rio Preto
+</td>
+<td style="text-align:right;">
+2564
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Indaiatuba
+</td>
+<td style="text-align:right;">
+2563
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mauá
+</td>
+<td style="text-align:right;">
+2490
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bauru
+</td>
+<td style="text-align:right;">
+2448
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Vicente
+</td>
+<td style="text-align:right;">
+2222
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Praia Grande
+</td>
+<td style="text-align:right;">
+2221
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santos
+</td>
+<td style="text-align:right;">
+2074
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Hortolândia
+</td>
+<td style="text-align:right;">
+2022
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Taboão da Serra
+</td>
+<td style="text-align:right;">
+2012
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Embu das Artes
+</td>
+<td style="text-align:right;">
+1917
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itapevi
+</td>
+<td style="text-align:right;">
+1872
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Francisco Morato
+</td>
+<td style="text-align:right;">
+1764
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Taubaté
+</td>
+<td style="text-align:right;">
+1756
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Suzano
+</td>
+<td style="text-align:right;">
+1723
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itapetininga
+</td>
+<td style="text-align:right;">
+1715
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ribeirão Preto
+</td>
+<td style="text-align:right;">
+1700
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guarujá
+</td>
+<td style="text-align:right;">
+1666
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Franco da Rocha
+</td>
+<td style="text-align:right;">
+1663
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Bárbara d’Oeste
+</td>
+<td style="text-align:right;">
+1663
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Marília
+</td>
+<td style="text-align:right;">
+1632
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santana de Parnaíba
+</td>
+<td style="text-align:right;">
+1587
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sumaré
+</td>
+<td style="text-align:right;">
+1562
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ourinhos
+</td>
+<td style="text-align:right;">
+1538
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Carapicuíba
+</td>
+<td style="text-align:right;">
+1520
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itatiba
+</td>
+<td style="text-align:right;">
+1511
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Catanduva
+</td>
+<td style="text-align:right;">
+1474
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Limeira
+</td>
+<td style="text-align:right;">
+1434
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itapecerica da Serra
+</td>
+<td style="text-align:right;">
+1410
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Botucatu
+</td>
+<td style="text-align:right;">
+1392
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tatuí
+</td>
+<td style="text-align:right;">
+1384
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Roque
+</td>
+<td style="text-align:right;">
+1188
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Salto
+</td>
+<td style="text-align:right;">
+1167
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pindamonhangaba
+</td>
+<td style="text-align:right;">
+1128
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sertãozinho
+</td>
+<td style="text-align:right;">
+1095
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itu
+</td>
+<td style="text-align:right;">
+1085
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itanhaém
+</td>
+<td style="text-align:right;">
+1076
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Caraguatatuba
+</td>
+<td style="text-align:right;">
+1028
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guaratinguetá
+</td>
+<td style="text-align:right;">
+1022
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bragança Paulista
+</td>
+<td style="text-align:right;">
+1012
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ribeirão Pires
+</td>
+<td style="text-align:right;">
+976
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Birigui
+</td>
+<td style="text-align:right;">
+966
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Araçatuba
+</td>
+<td style="text-align:right;">
+964
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cosmópolis
+</td>
+<td style="text-align:right;">
+925
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Presidente Prudente
+</td>
+<td style="text-align:right;">
+923
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ubatuba
+</td>
+<td style="text-align:right;">
+921
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jaú
+</td>
+<td style="text-align:right;">
+868
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Caieiras
+</td>
+<td style="text-align:right;">
+867
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Carlos
+</td>
+<td style="text-align:right;">
+858
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ibiúna
+</td>
+<td style="text-align:right;">
+842
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Caetano do Sul
+</td>
+<td style="text-align:right;">
+811
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Matão
+</td>
+<td style="text-align:right;">
+762
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Sebastião
+</td>
+<td style="text-align:right;">
+759
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Monte Mor
+</td>
+<td style="text-align:right;">
+733
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itararé
+</td>
+<td style="text-align:right;">
+731
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tietê
+</td>
+<td style="text-align:right;">
+707
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Caçapava
+</td>
+<td style="text-align:right;">
+701
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Campo Limpo Paulista
+</td>
+<td style="text-align:right;">
+696
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Artur Nogueira
+</td>
+<td style="text-align:right;">
+689
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bebedouro
+</td>
+<td style="text-align:right;">
+688
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cruzeiro
+</td>
+<td style="text-align:right;">
+665
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Atibaia
+</td>
+<td style="text-align:right;">
+664
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Leme
+</td>
+<td style="text-align:right;">
+658
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Penápolis
+</td>
+<td style="text-align:right;">
+652
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guariba
+</td>
+<td style="text-align:right;">
+650
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Paraguaçu Paulista
+</td>
+<td style="text-align:right;">
+649
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cerquilho
+</td>
+<td style="text-align:right;">
+640
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Porto Ferreira
+</td>
+<td style="text-align:right;">
+639
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Andradina
+</td>
+<td style="text-align:right;">
+625
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dracena
+</td>
+<td style="text-align:right;">
+624
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Votuporanga
+</td>
+<td style="text-align:right;">
+624
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itupeva
+</td>
+<td style="text-align:right;">
+614
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Américo Brasiliense
+</td>
+<td style="text-align:right;">
+606
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ferraz de Vasconcelos
+</td>
+<td style="text-align:right;">
+604
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Várzea Paulista
+</td>
+<td style="text-align:right;">
+602
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Olímpia
+</td>
+<td style="text-align:right;">
+567
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mongaguá
+</td>
+<td style="text-align:right;">
+562
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Capivari
+</td>
+<td style="text-align:right;">
+555
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Moji Mirim
+</td>
+<td style="text-align:right;">
+554
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Porto Feliz
+</td>
+<td style="text-align:right;">
+553
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Iperó
+</td>
+<td style="text-align:right;">
+530
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jales
+</td>
+<td style="text-align:right;">
+526
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lençóis Paulista
+</td>
+<td style="text-align:right;">
+519
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Orlândia
+</td>
+<td style="text-align:right;">
+518
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jacareí
+</td>
+<td style="text-align:right;">
+489
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fernandópolis
+</td>
+<td style="text-align:right;">
+478
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mairiporã
+</td>
+<td style="text-align:right;">
+476
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vinhedo
+</td>
+<td style="text-align:right;">
+476
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Amparo
+</td>
+<td style="text-align:right;">
+472
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tupã
+</td>
+<td style="text-align:right;">
+469
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pirassununga
+</td>
+<td style="text-align:right;">
+462
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Capão Bonito
+</td>
+<td style="text-align:right;">
+453
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Peruíbe
+</td>
+<td style="text-align:right;">
+453
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itapira
+</td>
+<td style="text-align:right;">
+435
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pederneiras
+</td>
+<td style="text-align:right;">
+429
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Araçoiaba da Serra
+</td>
+<td style="text-align:right;">
+428
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jardinópolis
+</td>
+<td style="text-align:right;">
+428
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Colina
+</td>
+<td style="text-align:right;">
+427
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jaguariúna
+</td>
+<td style="text-align:right;">
+417
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Álvares Machado
+</td>
+<td style="text-align:right;">
+416
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Promissão
+</td>
+<td style="text-align:right;">
+413
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Buri
+</td>
+<td style="text-align:right;">
+399
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Socorro
+</td>
+<td style="text-align:right;">
+390
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Manuel
+</td>
+<td style="text-align:right;">
+388
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jaboticabal
+</td>
+<td style="text-align:right;">
+381
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Gertrudes
+</td>
+<td style="text-align:right;">
+381
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pilar do Sul
+</td>
+<td style="text-align:right;">
+374
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Embu-Guaçu
+</td>
+<td style="text-align:right;">
+373
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pradópolis
+</td>
+<td style="text-align:right;">
+366
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pitangueiras
+</td>
+<td style="text-align:right;">
+364
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Louveira
+</td>
+<td style="text-align:right;">
+362
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Monte Aprazível
+</td>
+<td style="text-align:right;">
+362
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guaíra
+</td>
+<td style="text-align:right;">
+351
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itápolis
+</td>
+<td style="text-align:right;">
+351
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Piraju
+</td>
+<td style="text-align:right;">
+349
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pedreira
+</td>
+<td style="text-align:right;">
+344
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Pedro
+</td>
+<td style="text-align:right;">
+334
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Miguelópolis
+</td>
+<td style="text-align:right;">
+330
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Viradouro
+</td>
+<td style="text-align:right;">
+328
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lins
+</td>
+<td style="text-align:right;">
+326
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itaí
+</td>
+<td style="text-align:right;">
+317
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Taquarituba
+</td>
+<td style="text-align:right;">
+317
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Piedade
+</td>
+<td style="text-align:right;">
+316
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Altinópolis
+</td>
+<td style="text-align:right;">
+315
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Fé do Sul
+</td>
+<td style="text-align:right;">
+314
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Juquitiba
+</td>
+<td style="text-align:right;">
+313
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guararema
+</td>
+<td style="text-align:right;">
+312
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Severínia
+</td>
+<td style="text-align:right;">
+311
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rio Grande da Serra
+</td>
+<td style="text-align:right;">
+307
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tremembé
+</td>
+<td style="text-align:right;">
+305
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guapiaçu
+</td>
+<td style="text-align:right;">
+302
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Salto de Pirapora
+</td>
+<td style="text-align:right;">
+298
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Branca
+</td>
+<td style="text-align:right;">
+298
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Capela do Alto
+</td>
+<td style="text-align:right;">
+294
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+José Bonifácio
+</td>
+<td style="text-align:right;">
+294
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pereira Barreto
+</td>
+<td style="text-align:right;">
+291
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cesário Lange
+</td>
+<td style="text-align:right;">
+289
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Monte Alto
+</td>
+<td style="text-align:right;">
+285
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tarumã
+</td>
+<td style="text-align:right;">
+284
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mirante do Paranapanema
+</td>
+<td style="text-align:right;">
+282
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Batatais
+</td>
+<td style="text-align:right;">
+281
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São João da Boa Vista
+</td>
+<td style="text-align:right;">
+281
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Piracaia
+</td>
+<td style="text-align:right;">
+280
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Brotas
+</td>
+<td style="text-align:right;">
+279
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rio das Pedras
+</td>
+<td style="text-align:right;">
+278
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cândido Mota
+</td>
+<td style="text-align:right;">
+277
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Miracatu
+</td>
+<td style="text-align:right;">
+273
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rancharia
+</td>
+<td style="text-align:right;">
+273
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bariri
+</td>
+<td style="text-align:right;">
+271
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Engenheiro Coelho
+</td>
+<td style="text-align:right;">
+269
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Osvaldo Cruz
+</td>
+<td style="text-align:right;">
+269
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Iracemápolis
+</td>
+<td style="text-align:right;">
+266
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Águas de Lindóia
+</td>
+<td style="text-align:right;">
+262
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Espírito Santo do Pinhal
+</td>
+<td style="text-align:right;">
+262
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Igarapava
+</td>
+<td style="text-align:right;">
+259
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Iguape
+</td>
+<td style="text-align:right;">
+257
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Martinópolis
+</td>
+<td style="text-align:right;">
+257
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Igaraçu do Tietê
+</td>
+<td style="text-align:right;">
+256
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Cruz das Palmeiras
+</td>
+<td style="text-align:right;">
+254
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Rita do Passa Quatro
+</td>
+<td style="text-align:right;">
+254
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Eldorado
+</td>
+<td style="text-align:right;">
+253
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pinhalzinho
+</td>
+<td style="text-align:right;">
+253
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Roseira
+</td>
+<td style="text-align:right;">
+250
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nova Odessa
+</td>
+<td style="text-align:right;">
+249
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Junqueirópolis
+</td>
+<td style="text-align:right;">
+246
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cajobi
+</td>
+<td style="text-align:right;">
+243
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Potirendaba
+</td>
+<td style="text-align:right;">
+243
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Conchas
+</td>
+<td style="text-align:right;">
+241
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Descalvado
+</td>
+<td style="text-align:right;">
+241
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guararapes
+</td>
+<td style="text-align:right;">
+241
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Castilho
+</td>
+<td style="text-align:right;">
+240
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Taguaí
+</td>
+<td style="text-align:right;">
+238
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Brodowski
+</td>
+<td style="text-align:right;">
+234
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cravinhos
+</td>
+<td style="text-align:right;">
+225
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Rosa de Viterbo
+</td>
+<td style="text-align:right;">
+224
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Teodoro Sampaio
+</td>
+<td style="text-align:right;">
+224
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Potim
+</td>
+<td style="text-align:right;">
+218
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vargem Grande do Sul
+</td>
+<td style="text-align:right;">
+218
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guaraci
+</td>
+<td style="text-align:right;">
+217
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jacupiranga
+</td>
+<td style="text-align:right;">
+217
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bady Bassitt
+</td>
+<td style="text-align:right;">
+216
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ipuã
+</td>
+<td style="text-align:right;">
+214
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dois Córregos
+</td>
+<td style="text-align:right;">
+213
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cajati
+</td>
+<td style="text-align:right;">
+212
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Estiva Gerbi
+</td>
+<td style="text-align:right;">
+209
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nova Campina
+</td>
+<td style="text-align:right;">
+205
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guaiçara
+</td>
+<td style="text-align:right;">
+204
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tambaú
+</td>
+<td style="text-align:right;">
+201
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ipaussu
+</td>
+<td style="text-align:right;">
+196
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mirassol
+</td>
+<td style="text-align:right;">
+195
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itatinga
+</td>
+<td style="text-align:right;">
+194
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Laranjal Paulista
+</td>
+<td style="text-align:right;">
+194
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cordeirópolis
+</td>
+<td style="text-align:right;">
+193
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Adamantina
+</td>
+<td style="text-align:right;">
+191
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ilha Solteira
+</td>
+<td style="text-align:right;">
+191
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Monte Azul Paulista
+</td>
+<td style="text-align:right;">
+191
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ribeirão Bonito
+</td>
+<td style="text-align:right;">
+191
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ibirá
+</td>
+<td style="text-align:right;">
+190
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guará
+</td>
+<td style="text-align:right;">
+188
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pompéia
+</td>
+<td style="text-align:right;">
+187
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Uchoa
+</td>
+<td style="text-align:right;">
+187
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Angatuba
+</td>
+<td style="text-align:right;">
+183
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itajobi
+</td>
+<td style="text-align:right;">
+183
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Luís Antônio
+</td>
+<td style="text-align:right;">
+182
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Areiópolis
+</td>
+<td style="text-align:right;">
+181
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Charqueada
+</td>
+<td style="text-align:right;">
+181
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cedral
+</td>
+<td style="text-align:right;">
+180
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Elias Fausto
+</td>
+<td style="text-align:right;">
+180
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Holambra
+</td>
+<td style="text-align:right;">
+180
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Adélia
+</td>
+<td style="text-align:right;">
+180
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jaborandi
+</td>
+<td style="text-align:right;">
+179
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cerqueira César
+</td>
+<td style="text-align:right;">
+177
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fartura
+</td>
+<td style="text-align:right;">
+174
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Morungaba
+</td>
+<td style="text-align:right;">
+174
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Palmital
+</td>
+<td style="text-align:right;">
+174
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tanabi
+</td>
+<td style="text-align:right;">
+174
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Caconde
+</td>
+<td style="text-align:right;">
+173
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ouroeste
+</td>
+<td style="text-align:right;">
+171
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Palestina
+</td>
+<td style="text-align:right;">
+171
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Boa Esperança do Sul
+</td>
+<td style="text-align:right;">
+170
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tupi Paulista
+</td>
+<td style="text-align:right;">
+170
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Taquarivaí
+</td>
+<td style="text-align:right;">
+166
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sete Barras
+</td>
+<td style="text-align:right;">
+164
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Urupês
+</td>
+<td style="text-align:right;">
+164
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bastos
+</td>
+<td style="text-align:right;">
+163
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Valentim Gentil
+</td>
+<td style="text-align:right;">
+162
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Panorama
+</td>
+<td style="text-align:right;">
+161
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Presidente Bernardes
+</td>
+<td style="text-align:right;">
+161
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ouro Verde
+</td>
+<td style="text-align:right;">
+159
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Chavantes
+</td>
+<td style="text-align:right;">
+159
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Colômbia
+</td>
+<td style="text-align:right;">
+156
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Arealva
+</td>
+<td style="text-align:right;">
+151
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nuporanga
+</td>
+<td style="text-align:right;">
+151
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Buritama
+</td>
+<td style="text-align:right;">
+150
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Manduri
+</td>
+<td style="text-align:right;">
+150
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rosana
+</td>
+<td style="text-align:right;">
+147
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sarapuí
+</td>
+<td style="text-align:right;">
+146
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pariquera-Açu
+</td>
+<td style="text-align:right;">
+145
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santo Antônio do Aracanguá
+</td>
+<td style="text-align:right;">
+144
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Riolândia
+</td>
+<td style="text-align:right;">
+141
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rincão
+</td>
+<td style="text-align:right;">
+140
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Bento do Sapucaí
+</td>
+<td style="text-align:right;">
+135
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Clementina
+</td>
+<td style="text-align:right;">
+132
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Macatuba
+</td>
+<td style="text-align:right;">
+131
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Iacanga
+</td>
+<td style="text-align:right;">
+130
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pirajuí
+</td>
+<td style="text-align:right;">
+130
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Restinga
+</td>
+<td style="text-align:right;">
+129
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pedregulho
+</td>
+<td style="text-align:right;">
+128
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Euclides da Cunha Paulista
+</td>
+<td style="text-align:right;">
+127
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santo Anastácio
+</td>
+<td style="text-align:right;">
+125
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mineiros do Tietê
+</td>
+<td style="text-align:right;">
+123
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Duartina
+</td>
+<td style="text-align:right;">
+122
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Palmares Paulista
+</td>
+<td style="text-align:right;">
+122
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tuiuti
+</td>
+<td style="text-align:right;">
+122
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cardoso
+</td>
+<td style="text-align:right;">
+121
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cristais Paulista
+</td>
+<td style="text-align:right;">
+121
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Queluz
+</td>
+<td style="text-align:right;">
+120
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Barra do Turvo
+</td>
+<td style="text-align:right;">
+119
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dourado
+</td>
+<td style="text-align:right;">
+119
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Quatá
+</td>
+<td style="text-align:right;">
+118
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bernardino de Campos
+</td>
+<td style="text-align:right;">
+117
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nova Aliança
+</td>
+<td style="text-align:right;">
+117
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dumont
+</td>
+<td style="text-align:right;">
+115
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fernando Prestes
+</td>
+<td style="text-align:right;">
+115
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Flórida Paulista
+</td>
+<td style="text-align:right;">
+115
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Lourenço da Serra
+</td>
+<td style="text-align:right;">
+114
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Piacatu
+</td>
+<td style="text-align:right;">
+112
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Barbosa
+</td>
+<td style="text-align:right;">
+109
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itariri
+</td>
+<td style="text-align:right;">
+109
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Piquete
+</td>
+<td style="text-align:right;">
+109
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santo Antônio do Pinhal
+</td>
+<td style="text-align:right;">
+108
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jambeiro
+</td>
+<td style="text-align:right;">
+107
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lavrinhas
+</td>
+<td style="text-align:right;">
+107
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Quintana
+</td>
+<td style="text-align:right;">
+106
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cássia dos Coqueiros
+</td>
+<td style="text-align:right;">
+105
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Orindiúva
+</td>
+<td style="text-align:right;">
+105
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ariranha
+</td>
+<td style="text-align:right;">
+103
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Canas
+</td>
+<td style="text-align:right;">
+101
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Canitar
+</td>
+<td style="text-align:right;">
+101
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Neves Paulista
+</td>
+<td style="text-align:right;">
+101
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guatapará
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ipiguá
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tapiraí
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tejupá
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Iaras
+</td>
+<td style="text-align:right;">
+98
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sales Oliveira
+</td>
+<td style="text-align:right;">
+97
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Icém
+</td>
+<td style="text-align:right;">
+96
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itapuí
+</td>
+<td style="text-align:right;">
+95
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pedra Bela
+</td>
+<td style="text-align:right;">
+95
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bom Sucesso de Itararé
+</td>
+<td style="text-align:right;">
+94
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rafard
+</td>
+<td style="text-align:right;">
+94
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cafelândia
+</td>
+<td style="text-align:right;">
+93
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Gália
+</td>
+<td style="text-align:right;">
+93
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Avanhandava
+</td>
+<td style="text-align:right;">
+92
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Espírito Santo do Turvo
+</td>
+<td style="text-align:right;">
+92
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mombuca
+</td>
+<td style="text-align:right;">
+92
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Taiúva
+</td>
+<td style="text-align:right;">
+92
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itaberá
+</td>
+<td style="text-align:right;">
+90
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Serra Azul
+</td>
+<td style="text-align:right;">
+90
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Riversul
+</td>
+<td style="text-align:right;">
+89
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Américo de Campos
+</td>
+<td style="text-align:right;">
+88
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+João Ramalho
+</td>
+<td style="text-align:right;">
+88
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pratânia
+</td>
+<td style="text-align:right;">
+88
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Braúna
+</td>
+<td style="text-align:right;">
+87
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Iepê
+</td>
+<td style="text-align:right;">
+87
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Anhumas
+</td>
+<td style="text-align:right;">
+86
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bocaina
+</td>
+<td style="text-align:right;">
+86
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pereiras
+</td>
+<td style="text-align:right;">
+86
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Saltinho
+</td>
+<td style="text-align:right;">
+86
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Caiabu
+</td>
+<td style="text-align:right;">
+85
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Reginópolis
+</td>
+<td style="text-align:right;">
+84
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santópolis do Aguapeí
+</td>
+<td style="text-align:right;">
+84
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Catiguá
+</td>
+<td style="text-align:right;">
+83
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cosmorama
+</td>
+<td style="text-align:right;">
+83
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ubarana
+</td>
+<td style="text-align:right;">
+83
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pardinho
+</td>
+<td style="text-align:right;">
+82
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mendonça
+</td>
+<td style="text-align:right;">
+81
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dobrada
+</td>
+<td style="text-align:right;">
+80
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ipeúna
+</td>
+<td style="text-align:right;">
+80
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Patrocínio Paulista
+</td>
+<td style="text-align:right;">
+80
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Aramina
+</td>
+<td style="text-align:right;">
+79
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Paraíso
+</td>
+<td style="text-align:right;">
+79
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Taciba
+</td>
+<td style="text-align:right;">
+79
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bálsamo
+</td>
+<td style="text-align:right;">
+76
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ribeirão do Sul
+</td>
+<td style="text-align:right;">
+76
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Salto Grande
+</td>
+<td style="text-align:right;">
+76
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Irapuru
+</td>
+<td style="text-align:right;">
+74
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Natividade da Serra
+</td>
+<td style="text-align:right;">
+73
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Coroados
+</td>
+<td style="text-align:right;">
+72
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Gavião Peixoto
+</td>
+<td style="text-align:right;">
+72
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Echaporã
+</td>
+<td style="text-align:right;">
+71
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Albertina
+</td>
+<td style="text-align:right;">
+71
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Getulina
+</td>
+<td style="text-align:right;">
+70
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vista Alegre do Alto
+</td>
+<td style="text-align:right;">
+70
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rinópolis
+</td>
+<td style="text-align:right;">
+68
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Indiana
+</td>
+<td style="text-align:right;">
+67
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ocauçu
+</td>
+<td style="text-align:right;">
+67
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pirangi
+</td>
+<td style="text-align:right;">
+67
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Silveiras
+</td>
+<td style="text-align:right;">
+66
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Alambari
+</td>
+<td style="text-align:right;">
+65
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Coronel Macedo
+</td>
+<td style="text-align:right;">
+65
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jeriquara
+</td>
+<td style="text-align:right;">
+65
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Maracaí
+</td>
+<td style="text-align:right;">
+64
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mirassolândia
+</td>
+<td style="text-align:right;">
+64
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Irapuã
+</td>
+<td style="text-align:right;">
+63
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Onda Verde
+</td>
+<td style="text-align:right;">
+62
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Cruz da Esperança
+</td>
+<td style="text-align:right;">
+61
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São José do Barreiro
+</td>
+<td style="text-align:right;">
+61
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Borborema
+</td>
+<td style="text-align:right;">
+60
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Caiuá
+</td>
+<td style="text-align:right;">
+60
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Águas de São Pedro
+</td>
+<td style="text-align:right;">
+59
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nova Luzitânia
+</td>
+<td style="text-align:right;">
+59
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Ernestina
+</td>
+<td style="text-align:right;">
+59
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vera Cruz
+</td>
+<td style="text-align:right;">
+59
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Torrinha
+</td>
+<td style="text-align:right;">
+58
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nhandeara
+</td>
+<td style="text-align:right;">
+57
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Águas de Santa Bárbara
+</td>
+<td style="text-align:right;">
+56
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Arandu
+</td>
+<td style="text-align:right;">
+56
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rubiácea
+</td>
+<td style="text-align:right;">
+55
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Urânia
+</td>
+<td style="text-align:right;">
+55
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guzolândia
+</td>
+<td style="text-align:right;">
+54
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jaci
+</td>
+<td style="text-align:right;">
+54
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São Pedro do Turvo
+</td>
+<td style="text-align:right;">
+54
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ubirajara
+</td>
+<td style="text-align:right;">
+54
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Areias
+</td>
+<td style="text-align:right;">
+53
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lavínia
+</td>
+<td style="text-align:right;">
+53
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Macedônia
+</td>
+<td style="text-align:right;">
+53
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Meridiano
+</td>
+<td style="text-align:right;">
+53
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Oriente
+</td>
+<td style="text-align:right;">
+53
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Marapoama
+</td>
+<td style="text-align:right;">
+52
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Corumbataí
+</td>
+<td style="text-align:right;">
+51
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Aparecida d’Oeste
+</td>
+<td style="text-align:right;">
+50
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cabrália Paulista
+</td>
+<td style="text-align:right;">
+49
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Palmeira d’Oeste
+</td>
+<td style="text-align:right;">
+49
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santo Expedito
+</td>
+<td style="text-align:right;">
+49
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bilac
+</td>
+<td style="text-align:right;">
+48
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Paranapuã
+</td>
+<td style="text-align:right;">
+48
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Taquaral
+</td>
+<td style="text-align:right;">
+48
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Gabriel Monteiro
+</td>
+<td style="text-align:right;">
+47
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Herculândia
+</td>
+<td style="text-align:right;">
+45
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Alvinlândia
+</td>
+<td style="text-align:right;">
+44
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Campos Novos Paulista
+</td>
+<td style="text-align:right;">
+44
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nova Castilho
+</td>
+<td style="text-align:right;">
+43
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rifaina
+</td>
+<td style="text-align:right;">
+43
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lagoinha
+</td>
+<td style="text-align:right;">
+42
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lutécia
+</td>
+<td style="text-align:right;">
+41
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Macaubal
+</td>
+<td style="text-align:right;">
+41
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Monteiro Lobato
+</td>
+<td style="text-align:right;">
+41
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Estrela do Norte
+</td>
+<td style="text-align:right;">
+40
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itapirapuã Paulista
+</td>
+<td style="text-align:right;">
+40
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mariápolis
+</td>
+<td style="text-align:right;">
+39
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Redenção da Serra
+</td>
+<td style="text-align:right;">
+37
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itaju
+</td>
+<td style="text-align:right;">
+36
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Monte Castelo
+</td>
+<td style="text-align:right;">
+36
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Queiroz
+</td>
+<td style="text-align:right;">
+35
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Floreal
+</td>
+<td style="text-align:right;">
+34
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São João das Duas Pontes
+</td>
+<td style="text-align:right;">
+33
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Parisi
+</td>
+<td style="text-align:right;">
+32
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São João de Iracema
+</td>
+<td style="text-align:right;">
+32
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ribeirão dos Índios
+</td>
+<td style="text-align:right;">
+31
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+São João do Pau d’Alho
+</td>
+<td style="text-align:right;">
+30
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sebastianópolis do Sul
+</td>
+<td style="text-align:right;">
+30
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Itaóca
+</td>
+<td style="text-align:right;">
+29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Piquerobi
+</td>
+<td style="text-align:right;">
+28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Trabiju
+</td>
+<td style="text-align:right;">
+28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Borebi
+</td>
+<td style="text-align:right;">
+27
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guarani d’Oeste
+</td>
+<td style="text-align:right;">
+27
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sagres
+</td>
+<td style="text-align:right;">
+27
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Inúbia Paulista
+</td>
+<td style="text-align:right;">
+26
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Gastão Vidigal
+</td>
+<td style="text-align:right;">
+25
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Brejo Alegre
+</td>
+<td style="text-align:right;">
+24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fernão
+</td>
+<td style="text-align:right;">
+23
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Magda
+</td>
+<td style="text-align:right;">
+23
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Torre de Pedra
+</td>
+<td style="text-align:right;">
+23
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Embaúba
+</td>
+<td style="text-align:right;">
+22
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Florínia
+</td>
+<td style="text-align:right;">
+22
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Arco-Íris
+</td>
+<td style="text-align:right;">
+21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Clara d’Oeste
+</td>
+<td style="text-align:right;">
+21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Alfredo Marcondes
+</td>
+<td style="text-align:right;">
+20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Alto Alegre
+</td>
+<td style="text-align:right;">
+20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mesópolis
+</td>
+<td style="text-align:right;">
+20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pedrinhas Paulista
+</td>
+<td style="text-align:right;">
+20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pracinha
+</td>
+<td style="text-align:right;">
+20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Uru
+</td>
+<td style="text-align:right;">
+19
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lucianópolis
+</td>
+<td style="text-align:right;">
+18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Monções
+</td>
+<td style="text-align:right;">
+18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bento de Abreu
+</td>
+<td style="text-align:right;">
+17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Marinópolis
+</td>
+<td style="text-align:right;">
+16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Murutinga do Sul
+</td>
+<td style="text-align:right;">
+16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Divinolândia
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Balbinos
+</td>
+<td style="text-align:right;">
+14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Presidente Alves
+</td>
+<td style="text-align:right;">
+14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Aspásia
+</td>
+<td style="text-align:right;">
+13
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Casa Branca
+</td>
+<td style="text-align:right;">
+12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santa Salete
+</td>
+<td style="text-align:right;">
+12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vitória Brasil
+</td>
+<td style="text-align:right;">
+12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Borá
+</td>
+<td style="text-align:right;">
+9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dirce Reis
+</td>
+<td style="text-align:right;">
+9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Santana da Ponte Pensa
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vargem
+</td>
+<td style="text-align:right;">
+1
 </td>
 </tr>
 <tr>
@@ -708,17 +4177,12 @@ Docente professor de comunidade quilombola
 Total
 </td>
 <td style="text-align:right;">
-324338
-</td>
-<td style="text-align:right;">
-42918
-</td>
-<td style="text-align:right;">
-0.99
+245573
 </td>
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 <div id="descricao-da-variavel-vl_salario" class="section level3">
 <h3>Descrição da variável VL_SALARIO:</h3>

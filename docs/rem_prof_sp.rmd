@@ -1,7 +1,7 @@
 ---
 title: "Análise remuneralção professores no estado de São Paulo"
 author: "Jessica Voigt"
-date: "29 de janeiro de 2020"
+date: "31 de janeiro de 2020"
 output: 
   html_document:
     theme: paper
@@ -87,22 +87,35 @@ as.data.frame(colSums(is.na(rem_prof_sp)))
 ```
 <br>
 
-### Quantos funcionários constam no arquivo e média salarial?
-
-Como não temos dados de RG ou CPF, temos que verificar pelo nome, filtrados por município.
+### Quais são as categorias profissionais que constam no arquivo?
 
 ```{r}
-rem_prof_sp %>% 
-  distinct(CO_MUNICIPIO, CATEG_PROFISSIONAL, NO_PROFISSIONAL, .keep_all = TRUE) %>%
-  group_by(CATEG_PROFISSIONAL) %>%
-  summarise(qtde_funcionarios = n(),
-            media_salarial = round(mean(VL_SALARIO),0)) %>%
+
+categorias <- unique(rem_prof_sp$CATEG_PROFISSIONAL)
+
+data.frame("Categorias" = categorias) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed","responsive"))%>%
+  scroll_box(width = "700px", height = "200px")
+
+```
+
+
+### Distribuição de funcionários por município
+
+```{r}
+rem_prof_sp %>%
+  filter(ME_EXERCICIO == "06") %>%
+  group_by(CO_MUNICIPIO ,NO_MUNICIPIO) %>%
+  summarise(qtde_funcionarios = n_distinct(NO_PROFISSIONAL)) %>%
   ungroup() %>%
+  select(-c(CO_MUNICIPIO)) %>%
   arrange(desc(qtde_funcionarios)) %>%
-  mutate(perc = round(qtde_funcionarios/324338, 2)) %>%
   adorn_totals("row") %>%
-  kable() %>% 
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed","responsive"))
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed","responsive")) %>%
+  scroll_box(width = "700px", height = "200px")
+
 ```
 
 ###Descrição da variável VL_SALARIO:
