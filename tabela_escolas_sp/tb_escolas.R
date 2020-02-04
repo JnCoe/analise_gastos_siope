@@ -56,7 +56,8 @@ data_secretaria <- rede_ensino_sp %>%
 tb_escolas <- rem_prof_sp %>%
   clean_names() %>%
   distinct(no_municipio, local_exercicio) %>%
-  mutate(esc = tolower(stri_trans_general(local_exercicio, "Latin-ASCII")),
+  mutate(municipio = no_municipio,
+         esc = tolower(stri_trans_general(local_exercicio, "Latin-ASCII")),
          no_municipio = tolower(stri_trans_general(no_municipio, "Latin-ASCII"))) %>%
   rename(nome_escola_siope = local_exercicio) %>%
   filter(!grepl("sec mun", esc),
@@ -79,12 +80,10 @@ tb_escolas %>%
 
 #############################################################################
 #Acho que vou exportar para excel e trabalhar com o arquivo exportado.
-setwd("C:/Users/coliv/Documents/R-Projects/qualidade_gastos_educação/tabela_escolas_sp")
 
-tb_escolas <- as.data.frame(tb_escolas)
-
-writexl::write_xlsx(tb_escolas, 
-                    path = "tb_escolas.xlsx", col_names=TRUE)
+# setwd("C:/Users/coliv/Documents/R-Projects/qualidade_gastos_educação/tabela_escolas_sp")
+# tb_escolas <- as.data.frame(tb_escolas)
+#writexl::write_xlsx(tb_escolas, path = "tb_escolas.xlsx", col_names=TRUE)
 
 #############################################################################
 
@@ -115,7 +114,7 @@ ends <- data_secretaria %>%
 #excel
 tb_esc2 <- tb_escolas %>%
   filter(is.na(nome_escola_secretaria)) %>%
-  select(1:3) %>%
+  select(1:4) %>%
   mutate(esc = ifelse(no_municipio == "sao paulo", gsub("cei diret ", "", esc), esc),
          esc = ifelse(no_municipio == "sao paulo",gsub("ceu cei ","", esc),esc),
          esc = ifelse(no_municipio == "sao paulo",gsub("ceu emef ","", esc),esc),
@@ -154,5 +153,5 @@ tabela_endereco_escolas %>%
 
 
 #Salvando
-setwd("C:/Users/coliv/Documents/R-Projects/qualidade_gastos_educação/tabela_escolas_sp")
+setwd("C:/Users/coliv/Documents/R-Projects/qualidade_gastos_educação/analise_gastos_siope/tabela_escolas_sp")
 fwrite(tabela_endereco_escolas, file="tabela_endereco_escolas.csv")
