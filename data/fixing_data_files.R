@@ -2,6 +2,7 @@
 library(readr)
 library(dplyr)
 library(stringr)
+library(data.table)
 
 fix_nomes <- function(x){
   stopifnot(require(stringr))
@@ -82,3 +83,13 @@ for(i in 1:length(estados)){
   
   save(x, file=paste0(nome, "_despesa_total.Rdata"))
 }
+
+### Arquivo remuneração professores de São Paulo 2018
+
+rem_prof_sp_2018 <- fread("~/R-Projects/qualidade_gastos_educação/arquivos grandes (fora do git)/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2018.CSV")
+
+#Esse arquivo está com problemas de encoding, vou tentar salvar.
+
+rem_prof_2018 <- read_delim("~/R-Projects/qualidade_gastos_educação/arquivos grandes (fora do git)/REMUNERACAO_PROFISSIONAIS_EDUCACAO_SP_2018.CSV", 
+                            ";", escape_double = FALSE, locale = locale(encoding = "ISO-8859-1"), 
+                            trim_ws = TRUE)
