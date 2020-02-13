@@ -1,0 +1,6 @@
+076565323e94ea08868314f06747fa90 *divulgacao_anos_iniciais-escolas-2017.xlsx
+d35c85c1aa21ccba49c3433d13616b4f *divulgacao_anos_iniciais-escolas-2017.ods
+254f777d729d91764870edb19fb8e953 *divulgacao_anos_finais-escolas-2017.xlsx
+b5949730e1e474858b1bbdb47f00e522 *divulgacao_anos_finais-escolas-2017.ods
+ec8444bee69992dc405cdb40a2064a30 *divulgacao_ensino_medio-escolas-2017.xlsx
+d37a35618d4521cd713631bb653eca78 *divulgacao_ensino_medio-escolas-2017.ods
